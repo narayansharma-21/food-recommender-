@@ -7,6 +7,7 @@ import java.time.Instant;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -114,6 +115,7 @@ public class ApiExceptionHandler {
 				code,
 				message,
 				request.getRequestURI(),
+				MDC.get(RequestIdFilter.MDC_KEY),
 				violations);
 		return ResponseEntity.status(status).body(body);
 	}

@@ -9,6 +9,7 @@ public record ApiErrorResponse(
 		String code,
 		String message,
 		String path,
+		String requestId,
 		List<FieldViolation> fieldViolations) {
 
 	public record FieldViolation(String field, String message) {

@@ -29,12 +29,14 @@ class ApiExceptionHandlerTest {
 	@Test
 	void returnsStableValidationErrorContract() throws Exception {
 		mockMvc.perform(post("/test")
+				.header(RequestIdFilter.REQUEST_ID_HEADER, "validation-request")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("{\"name\":\"\"}"))
 				.andExpect(status().isBadRequest())
 				.andExpect(jsonPath("$.status").value(400))
 				.andExpect(jsonPath("$.code").value("VALIDATION_FAILED"))
 				.andExpect(jsonPath("$.path").value("/test"))
+				.andExpect(jsonPath("$.requestId").value("validation-request"))
 				.andExpect(jsonPath("$.fieldViolations[0].field").value("name"));
 	}
 
