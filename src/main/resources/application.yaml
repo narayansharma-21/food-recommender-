@@ -27,3 +27,9 @@ logging:
   structured:
     format:
       console: ${LOG_FORMAT:logstash}
+
+platform:
+  storage:
+    provider: ${OBJECT_STORAGE_PROVIDER:filesystem}
+    filesystem:
+      root: ${OBJECT_STORAGE_ROOT:.local-storage}

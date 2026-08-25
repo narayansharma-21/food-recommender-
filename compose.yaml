@@ -23,11 +23,15 @@ services:
       DATABASE_URL: jdbc:postgresql://database:5432/${DATABASE_NAME:-food_recommender}
       DATABASE_USERNAME: ${DATABASE_USERNAME:-food_recommender}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD:-local-development-only}
+      OBJECT_STORAGE_ROOT: /data
     ports:
       - "8080:8080"
+    volumes:
+      - object-storage:/data
     depends_on:
       database:
         condition: service_healthy
 
 volumes:
   postgres-data:
+  object-storage:
