@@ -30,4 +30,13 @@ The modules run in one application for V1. Module boundaries make it possible to
 ./gradlew bootRun
 ```
 
+To run the backend and PostgreSQL together:
+
+```bash
+cp .env.example .env
+docker compose up --build
+```
+
+The Compose setup is for local development only. Production credentials must be supplied through the deployment environment.
+
 See [the backend design plan](docs/BACKEND_DESIGN_PLAN.md) for scope, task IDs, and delivery phases.
