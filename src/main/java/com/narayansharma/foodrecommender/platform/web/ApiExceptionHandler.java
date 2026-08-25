@@ -21,11 +21,7 @@ public class ApiExceptionHandler {
 	private static final Logger log = LoggerFactory.getLogger(ApiExceptionHandler.class);
 	private final Clock clock;
 
-	public ApiExceptionHandler() {
-		this(Clock.systemUTC());
-	}
-
-	ApiExceptionHandler(Clock clock) {
+	public ApiExceptionHandler(Clock clock) {
 		this.clock = clock;
 	}
 

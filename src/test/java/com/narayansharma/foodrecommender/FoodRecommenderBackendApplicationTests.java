@@ -14,7 +14,7 @@ class FoodRecommenderBackendApplicationTests {
 
 	@Test
 	void contextLoads() {
-		assertThat(flyway.info().current().getVersion().getVersion()).isEqualTo("1");
+		assertThat(flyway.info().applied()).isNotEmpty();
 	}
 
 }

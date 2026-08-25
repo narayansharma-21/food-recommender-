@@ -1,0 +1,2 @@
+ALTER TABLE background_jobs
+    ADD COLUMN version BIGINT NOT NULL DEFAULT 0;
