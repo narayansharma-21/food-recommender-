@@ -41,3 +41,37 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+def formattedFiles = files(fileTree('.') {
+	include '**/*.gradle', '**/*.java', '**/*.properties', '**/*.sql', '**/*.yaml', '**/*.yml'
+	exclude '.git/**', '.gradle/**', 'build/**'
+})
+
+tasks.register('verifyFormatting') {
+	group = 'verification'
+	description = 'Checks text files for trailing whitespace and missing final newlines.'
+	inputs.files(formattedFiles)
+
+	doLast {
+		def problems = []
+		formattedFiles.each { file ->
+			def content = file.getText('UTF-8')
+			if (!content.isEmpty() && !content.endsWith('\n')) {
+				problems << "${file}: missing final newline"
+			}
+			content.readLines().eachWithIndex { line, index ->
+				if (line ==~ /.*[ \t]+$/) {
+					problems << "${file}:${index + 1}: trailing whitespace"
+				}
+			}
+		}
+
+		if (!problems.isEmpty()) {
+			throw new GradleException("Formatting violations:\n${problems.join('\n')}")
+		}
+	}
+}
+
+tasks.named('check') {
+	dependsOn tasks.named('verifyFormatting')
+}
