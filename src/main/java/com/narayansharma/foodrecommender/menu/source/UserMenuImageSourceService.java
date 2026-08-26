@@ -1,6 +1,8 @@
 package com.narayansharma.foodrecommender.menu.source;
 
 import com.narayansharma.foodrecommender.menu.source.SizeLimitedInputStream.MenuImageTooLargeException;
+import com.narayansharma.foodrecommender.menu.version.CapturedMenuVersion;
+import com.narayansharma.foodrecommender.menu.version.MenuVersionCaptureService;
 import com.narayansharma.foodrecommender.platform.storage.ObjectStorage;
 import com.narayansharma.foodrecommender.platform.storage.StoredObject;
 import java.io.IOException;
@@ -34,12 +36,14 @@ public class UserMenuImageSourceService {
 
 	private final JdbcTemplate jdbcTemplate;
 	private final ObjectStorage objectStorage;
+	private final MenuVersionCaptureService versionCaptureService;
 	private final Clock clock;
 	private final long maximumBytes;
 
 	public UserMenuImageSourceService(
 			JdbcTemplate jdbcTemplate,
 			ObjectStorage objectStorage,
+			MenuVersionCaptureService versionCaptureService,
 			Clock clock,
 			@Value("${menu.upload.max-bytes:10485760}") long maximumBytes) {
 		if (maximumBytes < PNG_SIGNATURE.length) {
@@ -47,6 +51,7 @@ public class UserMenuImageSourceService {
 		}
 		this.jdbcTemplate = jdbcTemplate;
 		this.objectStorage = objectStorage;
+		this.versionCaptureService = versionCaptureService;
 		this.clock = clock;
 		this.maximumBytes = maximumBytes;
 	}
@@ -80,8 +85,11 @@ public class UserMenuImageSourceService {
 				storedObject.size(),
 				Timestamp.from(now),
 				Timestamp.from(now));
+		CapturedMenuVersion version = versionCaptureService.capture(
+				sourceId, storedObject, normalizedMediaType, now);
 		return new UploadedMenuImageSource(
 				sourceId,
+				version.versionId(),
 				storedObject.key(),
 				normalizedMediaType,
 				storedObject.size(),

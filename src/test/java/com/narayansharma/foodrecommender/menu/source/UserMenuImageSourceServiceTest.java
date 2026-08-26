@@ -69,6 +69,8 @@ class UserMenuImageSourceServiceTest {
 	void validatesStoresAndRegistersAPngUpload() {
 		UploadedMenuImageSource uploaded = service.upload(
 				MENU_ID, "user-123", "image/png", new ByteArrayInputStream(PNG));
+		UploadedMenuImageSource secondUpload = service.upload(
+				MENU_ID, "user-123", "image/png", new ByteArrayInputStream(PNG));
 
 		assertThat(uploaded.objectKey()).startsWith("menu-images/");
 		assertThat(uploaded.sizeBytes()).isEqualTo(PNG.length);
@@ -77,6 +79,12 @@ class UserMenuImageSourceServiceTest {
 				.isEqualTo("USER_IMAGE");
 		assertThat(value("SELECT media_type FROM menu_sources WHERE id = ?", uploaded.sourceId()))
 				.isEqualTo("image/png");
+		assertThat(value("SELECT content_sha256 FROM menu_versions WHERE id = ?", uploaded.versionId()))
+				.isEqualTo(uploaded.sha256());
+		assertThat(number("SELECT version_number FROM menu_versions WHERE id = ?", uploaded.versionId()))
+				.isEqualTo(1);
+		assertThat(number("SELECT version_number FROM menu_versions WHERE id = ?", secondUpload.versionId()))
+				.isEqualTo(2);
 	}
 
 	@Test
@@ -102,6 +110,10 @@ class UserMenuImageSourceServiceTest {
 
 	private String value(String sql, UUID id) {
 		return jdbcTemplate.queryForObject(sql, String.class, id);
+	}
+
+	private Integer number(String sql, UUID id) {
+		return jdbcTemplate.queryForObject(sql, Integer.class, id);
 	}
 
 	@TestConfiguration(proxyBeanMethods = false)
