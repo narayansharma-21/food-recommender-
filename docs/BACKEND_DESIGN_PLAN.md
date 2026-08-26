@@ -60,6 +60,8 @@ Keep these as modules inside one Spring Boot application. Each module owns its b
 
 ### 4.1 Platform Foundation
 
+Status: Complete.
+
 Owns configuration, database access, errors, security helpers, background jobs, and observability.
 
 Tasks:
@@ -101,6 +103,8 @@ Done when:
 
 ### 4.3 Restaurant Catalog
 
+Status: Complete for the Greater Boston proof of concept.
+
 Owns restaurant locations and source identifiers.
 
 Tasks:
@@ -120,6 +124,8 @@ Done when:
 - A restaurant can exist before its menu is available.
 
 ### 4.4 Menu Sources and Versioning
+
+Status: Next milestone.
 
 Owns menu sources, snapshots, versions, freshness, and publication state.
 
