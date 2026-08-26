@@ -33,3 +33,14 @@ platform:
     provider: ${OBJECT_STORAGE_PROVIDER:filesystem}
     filesystem:
       root: ${OBJECT_STORAGE_ROOT:.local-storage}
+
+catalog:
+  launch-area:
+    name: Greater Boston
+    region: MA
+    country-code: US
+    municipalities: Boston,Cambridge,Somerville,Brookline,Newton,Quincy,Medford,Everett,Chelsea,Revere,Malden,Watertown,Arlington
+  overture:
+    import-on-startup: ${OVERTURE_IMPORT_ON_STARTUP:false}
+    minimum-records: ${OVERTURE_MINIMUM_RECORDS:100}
+    snapshot: ${OVERTURE_PLACES_PATH:file:data/greater-boston-places.geojson}

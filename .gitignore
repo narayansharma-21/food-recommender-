@@ -1,6 +1,7 @@
 HELP.md
 .env
 .local-storage/
+data/
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar
