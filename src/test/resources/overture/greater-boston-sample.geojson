@@ -1,0 +1,66 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {"type": "Point", "coordinates": [-71.1100, 42.3700]},
+      "properties": {
+        "id": "cambridge-restaurant",
+        "names": {"primary": "Café Sample"},
+        "categories": {"primary": "restaurant"},
+        "confidence": 0.91,
+        "websites": ["https://example.com"],
+        "phones": ["+16175550100"],
+        "addresses": [{
+          "freeform": "123 Main Street",
+          "locality": "Cambridge",
+          "postcode": "02139",
+          "region": "MA",
+          "country": "US"
+        }],
+        "operating_status": "open"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {"type": "Point", "coordinates": [-71.0600, 42.3600]},
+      "properties": {
+        "id": "boston-cafe",
+        "names": {"primary": "Boston Coffee"},
+        "categories": {"primary": "cafe"},
+        "addresses": [{"locality": "Boston", "region": "MA", "country": "US"}]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {"type": "Point", "coordinates": [-71.1000, 42.3700]},
+      "properties": {
+        "id": "cambridge-shop",
+        "names": {"primary": "Sample Clothing"},
+        "categories": {"primary": "clothing_store"},
+        "addresses": [{"locality": "Cambridge", "region": "MA", "country": "US"}]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {"type": "Point", "coordinates": [-71.4100, 41.8200]},
+      "properties": {
+        "id": "outside-launch-area",
+        "names": {"primary": "Providence Restaurant"},
+        "categories": {"primary": "restaurant"},
+        "addresses": [{"locality": "Providence", "region": "RI", "country": "US"}]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {"type": "Point", "coordinates": [-71.0800, 42.3500]},
+      "properties": {
+        "id": "closed-restaurant",
+        "names": {"primary": "Closed Restaurant"},
+        "categories": {"primary": "restaurant"},
+        "addresses": [{"locality": "Boston", "region": "MA", "country": "US"}],
+        "operating_status": "permanently_closed"
+      }
+    }
+  ]
+}
