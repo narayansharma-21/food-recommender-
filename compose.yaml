@@ -26,6 +26,7 @@ services:
       OBJECT_STORAGE_ROOT: /data
       OVERTURE_IMPORT_ON_STARTUP: ${OVERTURE_IMPORT_ON_STARTUP:-false}
       OVERTURE_PLACES_PATH: file:/imports/greater-boston-places.geojson
+      MENU_UPLOAD_MAX_BYTES: ${MENU_UPLOAD_MAX_BYTES:-10485760}
     ports:
       - "8080:8080"
     volumes:

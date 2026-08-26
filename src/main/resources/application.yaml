@@ -44,3 +44,7 @@ catalog:
     import-on-startup: ${OVERTURE_IMPORT_ON_STARTUP:false}
     minimum-records: ${OVERTURE_MINIMUM_RECORDS:100}
     snapshot: ${OVERTURE_PLACES_PATH:file:data/greater-boston-places.geojson}
+
+menu:
+  upload:
+    max-bytes: ${MENU_UPLOAD_MAX_BYTES:10485760}
