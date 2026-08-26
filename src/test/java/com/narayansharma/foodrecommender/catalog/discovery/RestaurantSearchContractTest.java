@@ -28,5 +28,8 @@ class RestaurantSearchContractTest {
 		assertThatThrownBy(() -> new RestaurantSearchQuery("pizza", "New York", "NY", "US", 51, null))
 				.isInstanceOf(IllegalArgumentException.class)
 				.hasMessageContaining("limit");
+		assertThatThrownBy(() -> new RestaurantSearchQuery("a b c d e f g h i j k", "Boston", "MA", "US", 20, null))
+				.isInstanceOf(IllegalArgumentException.class)
+				.hasMessageContaining("too long");
 	}
 }
