@@ -3,6 +3,8 @@ package com.narayansharma.foodrecommender.menu.source;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.narayansharma.foodrecommender.menu.version.CapturedMenuVersion;
+import com.narayansharma.foodrecommender.menu.version.MenuVersionCaptureService;
 import com.narayansharma.foodrecommender.platform.storage.ObjectStorage;
 import com.narayansharma.foodrecommender.platform.storage.StoredObject;
 import java.io.ByteArrayInputStream;
@@ -10,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.HexFormat;
 import java.util.Map;
@@ -41,6 +44,9 @@ class UserMenuImageSourceServiceTest {
 
 	@Autowired
 	private InMemoryObjectStorage objectStorage;
+
+	@Autowired
+	private MenuVersionCaptureService versionCaptureService;
 
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
@@ -94,6 +100,30 @@ class UserMenuImageSourceServiceTest {
 				.isInstanceOf(IllegalArgumentException.class)
 				.hasMessageContaining("does not match");
 		assertThat(objectStorage.objects).isEmpty();
+	}
+
+	@Test
+	void reusesAVersionWhenTheSameSourceContentIsCapturedAgain() {
+		UploadedMenuImageSource uploaded = service.upload(
+				MENU_ID, "user-123", "image/png", new ByteArrayInputStream(PNG));
+
+		CapturedMenuVersion repeated = versionCaptureService.capture(
+				uploaded.sourceId(),
+				new StoredObject(uploaded.objectKey(), uploaded.sizeBytes(), uploaded.sha256()),
+				uploaded.mediaType(),
+				Instant.now());
+		CapturedMenuVersion changed = versionCaptureService.capture(
+				uploaded.sourceId(),
+				new StoredObject("menu-images/changed", 10, "b".repeat(64)),
+				uploaded.mediaType(),
+				Instant.now());
+
+		assertThat(repeated.versionId()).isEqualTo(uploaded.versionId());
+		assertThat(repeated.createdNewVersion()).isFalse();
+		assertThat(changed.createdNewVersion()).isTrue();
+		assertThat(changed.versionNumber()).isEqualTo(2);
+		assertThat(number("SELECT COUNT(*) FROM menu_versions WHERE source_id = ?", uploaded.sourceId()))
+				.isEqualTo(2);
 	}
 
 	@Test

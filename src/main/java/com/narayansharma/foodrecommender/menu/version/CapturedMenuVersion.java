@@ -8,5 +8,6 @@ public record CapturedMenuVersion(
 		UUID menuId,
 		UUID sourceId,
 		int versionNumber,
-		Instant capturedAt) {
+		Instant capturedAt,
+		boolean createdNewVersion) {
 }

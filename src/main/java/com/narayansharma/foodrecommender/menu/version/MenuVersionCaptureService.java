@@ -34,6 +34,23 @@ public class MenuVersionCaptureService {
 		validate(sourceId, rawObject, mediaType, capturedAt);
 		UUID menuId = findMenuId(sourceId);
 		lockMenu(menuId);
+		List<CapturedMenuVersion> existing = jdbcTemplate.query("""
+				SELECT id, version_number, captured_at
+				FROM menu_versions
+				WHERE source_id = ? AND content_sha256 = ?
+				""",
+				(resultSet, rowNumber) -> new CapturedMenuVersion(
+						resultSet.getObject("id", UUID.class),
+						menuId,
+						sourceId,
+						resultSet.getInt("version_number"),
+						resultSet.getTimestamp("captured_at").toInstant(),
+						false),
+				sourceId,
+				rawObject.sha256());
+		if (!existing.isEmpty()) {
+			return existing.getFirst();
+		}
 		Integer nextVersion = jdbcTemplate.queryForObject("""
 				SELECT COALESCE(MAX(version_number), 0) + 1
 				FROM menu_versions
@@ -60,7 +77,7 @@ public class MenuVersionCaptureService {
 				rawObject.sha256(),
 				mediaType,
 				rawObject.size());
-		return new CapturedMenuVersion(versionId, menuId, sourceId, nextVersion, capturedAt);
+		return new CapturedMenuVersion(versionId, menuId, sourceId, nextVersion, capturedAt, true);
 	}
 
 	private UUID findMenuId(UUID sourceId) {
