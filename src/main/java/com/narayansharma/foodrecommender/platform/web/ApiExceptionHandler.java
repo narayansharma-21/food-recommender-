@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
@@ -72,6 +73,18 @@ public class ApiExceptionHandler {
 				HttpStatus.BAD_REQUEST,
 				"MALFORMED_REQUEST",
 				"The request body could not be read.",
+				request,
+				List.of());
+	}
+
+	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
+	ResponseEntity<ApiErrorResponse> handleTypeMismatch(
+			MethodArgumentTypeMismatchException exception,
+			HttpServletRequest request) {
+		return response(
+				HttpStatus.BAD_REQUEST,
+				"VALIDATION_FAILED",
+				"The request contains an invalid value.",
 				request,
 				List.of());
 	}

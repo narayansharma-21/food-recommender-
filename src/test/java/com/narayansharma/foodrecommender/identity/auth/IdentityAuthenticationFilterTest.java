@@ -2,6 +2,7 @@ package com.narayansharma.foodrecommender.identity.auth;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -58,6 +59,35 @@ class IdentityAuthenticationFilterTest {
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.displayName").value("Alex"))
 				.andExpect(jsonPath("$.homeCity").value("Cambridge"));
+	}
+
+	@Test
+	void managesOnlyTheAuthenticatedUsersRestrictions() throws Exception {
+		mockMvc.perform(put("/v1/users/me/restrictions/ALLERGY/shellfish")
+				.header("Authorization", "Bearer valid-token")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("""
+						{"displayName":"Shellfish","active":true}
+						"""))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.key").value("shellfish"));
+
+		mockMvc.perform(get("/v1/users/me/restrictions")
+				.header("Authorization", "Bearer valid-token"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$[0].displayName").value("Shellfish"));
+	}
+
+	@Test
+	void rejectsUnknownRestrictionTypes() throws Exception {
+		mockMvc.perform(put("/v1/users/me/restrictions/UNKNOWN/shellfish")
+				.header("Authorization", "Bearer valid-token")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("""
+						{"displayName":"Shellfish","active":true}
+						"""))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.code").value("VALIDATION_FAILED"));
 	}
 
 	@TestConfiguration(proxyBeanMethods = false)
