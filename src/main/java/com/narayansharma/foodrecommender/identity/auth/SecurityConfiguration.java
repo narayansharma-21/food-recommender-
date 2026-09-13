@@ -26,7 +26,7 @@ class SecurityConfiguration {
 				.exceptionHandling(exceptions -> exceptions.authenticationEntryPoint(authenticationEntryPoint))
 				.authorizeHttpRequests(authorize -> authorize
 						.requestMatchers("/actuator/health/**", "/actuator/info").permitAll()
-						.requestMatchers("/actuator/**").authenticated()
+						.requestMatchers("/actuator/**").denyAll()
 						.requestMatchers("/v1/**").authenticated()
 						.anyRequest().permitAll());
 		IdentityTokenVerifier tokenVerifier = tokenVerifierProvider.getIfAvailable();

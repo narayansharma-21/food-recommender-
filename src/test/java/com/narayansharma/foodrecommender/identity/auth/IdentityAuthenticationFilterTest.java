@@ -44,6 +44,13 @@ class IdentityAuthenticationFilterTest {
 	}
 
 	@Test
+	void doesNotGrantOperationalAccessToNormalUsers() throws Exception {
+		mockMvc.perform(get("/actuator/metrics")
+				.header("Authorization", "Bearer valid-token"))
+				.andExpect(status().isForbidden());
+	}
+
+	@Test
 	void readsAndUpdatesOnlyTheAuthenticatedUsersProfile() throws Exception {
 		mockMvc.perform(get("/v1/users/me")
 				.header("Authorization", "Bearer valid-token"))
