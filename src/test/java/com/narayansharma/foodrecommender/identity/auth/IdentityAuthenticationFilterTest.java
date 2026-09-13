@@ -47,7 +47,14 @@ class IdentityAuthenticationFilterTest {
 	void doesNotGrantOperationalAccessToNormalUsers() throws Exception {
 		mockMvc.perform(get("/actuator/metrics")
 				.header("Authorization", "Bearer valid-token"))
-				.andExpect(status().isForbidden());
+				.andExpect(status().isUnauthorized());
+	}
+
+	@Test
+	void leavesPublicHealthChecksIndependentFromUserTokens() throws Exception {
+		mockMvc.perform(get("/actuator/health/liveness")
+				.header("Authorization", "Bearer invalid-token"))
+				.andExpect(status().isOk());
 	}
 
 	@Test

@@ -30,6 +30,12 @@ public class IdentityAuthenticationFilter extends OncePerRequestFilter {
 	}
 
 	@Override
+	protected boolean shouldNotFilter(HttpServletRequest request) {
+		String versionedApiPrefix = request.getContextPath() + "/v1/";
+		return !request.getRequestURI().startsWith(versionedApiPrefix);
+	}
+
+	@Override
 	protected void doFilterInternal(
 			HttpServletRequest request,
 			HttpServletResponse response,
