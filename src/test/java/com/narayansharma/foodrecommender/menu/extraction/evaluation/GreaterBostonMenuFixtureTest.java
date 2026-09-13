@@ -35,7 +35,15 @@ class GreaterBostonMenuFixtureTest {
 			assertThat(fixture.ocrText().length()).isLessThan(1_000);
 			assertThat(fixture.expectedSections()).isNotEmpty();
 			assertThat(fixture.expectedSections())
-					.allSatisfy(section -> assertThat(section.items()).isNotEmpty());
+					.extracting(GreaterBostonMenuFixture.ExpectedSection::name)
+					.doesNotHaveDuplicates();
+			assertThat(fixture.expectedSections())
+					.allSatisfy(section -> {
+						assertThat(section.items()).isNotEmpty();
+						assertThat(section.items())
+								.extracting(GreaterBostonMenuFixture.ExpectedItem::name)
+								.doesNotHaveDuplicates();
+					});
 		}
 	}
 
