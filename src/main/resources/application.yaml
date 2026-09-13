@@ -28,6 +28,11 @@ logging:
     format:
       console: ${LOG_FORMAT:logstash}
 
+identity:
+  firebase:
+    enabled: ${FIREBASE_AUTH_ENABLED:false}
+    project-id: ${FIREBASE_PROJECT_ID:}
+
 platform:
   storage:
     provider: ${OBJECT_STORAGE_PROVIDER:filesystem}
