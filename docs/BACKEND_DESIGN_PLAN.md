@@ -84,6 +84,9 @@ Done when:
 
 ### 4.2 Identity and User Preferences
 
+Status: Proof-of-concept scope complete through `USER-04`. Consent history storage is ready; account
+deletion, data export, and user-facing privacy controls remain deferred as agreed.
+
 Owns users, authentication, privacy settings, allergies, and dietary restrictions.
 
 Tasks:
@@ -100,6 +103,14 @@ Done when:
 - A user can sign in and manage preferences.
 - Allergies are available to the recommendation filter.
 - A user can request export or deletion.
+
+Proof-of-concept delivery:
+
+- Firebase ID tokens are verified through the official Java Admin SDK.
+- Provider identities map to stable internal users without making Firebase IDs primary keys.
+- Authenticated users can read and update their profile and declared restrictions.
+- Consent choices use append-only versioned history for the later privacy interface.
+- Health probes remain public; versioned APIs require sign-in; operational endpoints are not available to normal users.
 
 ### 4.3 Restaurant Catalog
 
@@ -460,7 +471,6 @@ These are initial targets. Adjust them after testing with real launch-city menus
 
 ## 10. Decisions Still Needed During Planning
 
-- Authentication provider.
 - Cloud and object-storage provider.
 - Text-enrichment model provider.
 - Raw menu image retention period.

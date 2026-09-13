@@ -70,4 +70,22 @@ Tesseract runs inside the provided application container. For direct host execut
 separately or set `TESSERACT_EXECUTABLE` to a trusted local binary. The Greater Boston parser accuracy
 fixtures run as part of `./gradlew check` and require at least 90% section, item-name, and price accuracy.
 
+## Firebase authentication
+
+Versioned API routes require a valid Firebase ID token. Authentication is disabled by default until a
+Firebase project is configured. To enable it, set:
+
+```text
+FIREBASE_AUTH_ENABLED=true
+FIREBASE_PROJECT_ID=your-project-id
+GOOGLE_APPLICATION_CREDENTIALS=/absolute/path/to/service-account.json
+```
+
+Keep the service-account file outside the repository. Mobile clients sign in through Firebase and send
+the resulting ID token as `Authorization: Bearer <token>`. The backend verifies the token and maps the
+Firebase user to a separate internal user ID.
+
+See the [official Firebase Admin setup guide](https://firebase.google.com/docs/admin/setup) for project
+and credential setup.
+
 See [the backend design plan](docs/BACKEND_DESIGN_PLAN.md) for scope, task IDs, and delivery phases.
