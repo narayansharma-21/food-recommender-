@@ -55,20 +55,7 @@ public class RatingService {
 		writeComment(ratingId, comment, now);
 		writeTags("rating_tags", ratingId, tags, now);
 
-		UUID revisionId = UUID.randomUUID();
-		jdbcTemplate.update("""
-				INSERT INTO rating_revisions (
-				    id, rating_id, revision_number, change_type, score,
-				    would_order_again, original_comment, created_at
-				) VALUES (?, ?, 1, 'CREATED', ?, ?, ?, ?)
-				""",
-				revisionId,
-				ratingId,
-				request.score(),
-				request.wouldOrderAgain(),
-				comment,
-				Timestamp.from(now));
-		writeTags("rating_revision_tags", revisionId, tags, now);
+		writeRevision(ratingId, 1, "CREATED", request, comment, tags, now);
 		return ratingId;
 	}
 
@@ -147,6 +134,32 @@ public class RatingService {
 					VALUES (?, ?, ?, ?)
 					""", ratingId, comment, Timestamp.from(now), Timestamp.from(now));
 		}
+	}
+
+	private void writeRevision(
+			UUID ratingId,
+			int revisionNumber,
+			String changeType,
+			SaveRatingRequest request,
+			String comment,
+			List<String> tags,
+			Instant now) {
+		UUID revisionId = UUID.randomUUID();
+		jdbcTemplate.update("""
+				INSERT INTO rating_revisions (
+				    id, rating_id, revision_number, change_type, score,
+				    would_order_again, original_comment, created_at
+				) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+				""",
+				revisionId,
+				ratingId,
+				revisionNumber,
+				changeType,
+				request.score(),
+				request.wouldOrderAgain(),
+				comment,
+				Timestamp.from(now));
+		writeTags("rating_revision_tags", revisionId, tags, now);
 	}
 
 	private void writeTags(String table, UUID id, List<String> tags, Instant now) {
