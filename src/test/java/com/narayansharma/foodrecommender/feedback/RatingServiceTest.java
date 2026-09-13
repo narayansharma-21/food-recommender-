@@ -70,6 +70,24 @@ class RatingServiceTest {
 				.hasMessage("The rating was not found.");
 	}
 
+	@Test
+	void updatesFeedbackWithoutErasingHistory() {
+		UUID userId = insertUser();
+		UUID itemId = insertMenuItemWithDish().itemId();
+		UUID ratingId = ratingService.create(
+				userId, new SaveRatingRequest(itemId, 3, false, "Okay", List.of("mild")));
+
+		ratingService.update(
+				userId, ratingId, new SaveRatingRequest(itemId, 5, true, "Excellent", List.of("savory")));
+
+		RatingView current = ratingQueryService.get(userId, ratingId);
+		assertThat(current.score()).isEqualTo(5);
+		assertThat(current.comment()).isEqualTo("Excellent");
+		assertThat(ratingQueryService.history(userId, ratingId))
+				.extracting(RatingRevisionView::changeType)
+				.containsExactly("UPDATED", "CREATED");
+	}
+
 	private UUID insertUser() {
 		UUID id = UUID.randomUUID();
 		jdbcTemplate.update("""

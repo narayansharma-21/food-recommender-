@@ -59,6 +59,30 @@ public class RatingService {
 		return ratingId;
 	}
 
+	@Transactional
+	public void update(UUID userId, UUID ratingId, SaveRatingRequest request) {
+		requireValidRequest(request);
+		lockActiveUser(userId);
+		UUID savedMenuItemId = findOwnedActiveRatingMenuItem(userId, ratingId);
+		if (!savedMenuItemId.equals(request.menuItemId())) {
+			throw new IllegalArgumentException("A rating cannot be moved to another menu item");
+		}
+
+		Instant now = clock.instant();
+		String comment = cleanComment(request.comment());
+		List<String> tags = cleanTags(request.tags());
+		jdbcTemplate.update("""
+				UPDATE ratings
+				SET score = ?, would_order_again = ?, updated_at = ?
+				WHERE id = ?
+				""", request.score(), request.wouldOrderAgain(), Timestamp.from(now), ratingId);
+		jdbcTemplate.update("DELETE FROM rating_comments WHERE rating_id = ?", ratingId);
+		writeComment(ratingId, comment, now);
+		jdbcTemplate.update("DELETE FROM rating_tags WHERE rating_id = ?", ratingId);
+		writeTags("rating_tags", ratingId, tags, now);
+		writeRevision(ratingId, nextRevisionNumber(ratingId), "UPDATED", request, comment, tags, now);
+	}
+
 	private void requireValidRequest(SaveRatingRequest request) {
 		if (request == null || request.menuItemId() == null) {
 			throw new IllegalArgumentException("Menu item is required");
@@ -99,6 +123,26 @@ public class RatingService {
 				userId,
 				menuItemId);
 		return count != null && count > 0;
+	}
+
+	private UUID findOwnedActiveRatingMenuItem(UUID userId, UUID ratingId) {
+		List<UUID> menuItems = jdbcTemplate.query(
+				"SELECT menu_item_id FROM ratings WHERE id = ? AND user_id = ? AND deleted_at IS NULL",
+				(resultSet, rowNumber) -> resultSet.getObject("menu_item_id", UUID.class),
+				ratingId,
+				userId);
+		if (menuItems.isEmpty()) {
+			throw new ApiException(HttpStatus.NOT_FOUND, "RATING_NOT_FOUND", "The rating was not found.");
+		}
+		return menuItems.getFirst();
+	}
+
+	private int nextRevisionNumber(UUID ratingId) {
+		Integer number = jdbcTemplate.queryForObject(
+				"SELECT COALESCE(MAX(revision_number), 0) + 1 FROM rating_revisions WHERE rating_id = ?",
+				Integer.class,
+				ratingId);
+		return number == null ? 1 : number;
 	}
 
 	private String cleanComment(String comment) {
