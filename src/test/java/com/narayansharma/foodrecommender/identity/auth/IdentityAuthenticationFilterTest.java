@@ -1,6 +1,7 @@
 package com.narayansharma.foodrecommender.identity.auth;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -11,6 +12,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,6 +40,24 @@ class IdentityAuthenticationFilterTest {
 				.header("Authorization", "Bearer invalid-token"))
 				.andExpect(status().isUnauthorized())
 				.andExpect(jsonPath("$.code").value("AUTHENTICATION_REQUIRED"));
+	}
+
+	@Test
+	void readsAndUpdatesOnlyTheAuthenticatedUsersProfile() throws Exception {
+		mockMvc.perform(get("/v1/users/me")
+				.header("Authorization", "Bearer valid-token"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.homeCity").value("Greater Boston"));
+
+		mockMvc.perform(patch("/v1/users/me")
+				.header("Authorization", "Bearer valid-token")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("""
+						{"displayName":"Alex","homeCity":"Cambridge","preferredLocale":"en-US"}
+						"""))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.displayName").value("Alex"))
+				.andExpect(jsonPath("$.homeCity").value("Cambridge"));
 	}
 
 	@TestConfiguration(proxyBeanMethods = false)
