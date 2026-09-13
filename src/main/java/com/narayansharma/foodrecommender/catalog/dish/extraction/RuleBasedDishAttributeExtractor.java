@@ -12,21 +12,29 @@ import org.springframework.stereotype.Component;
 @Component
 public class RuleBasedDishAttributeExtractor implements DishAttributeExtractor {
 	private static final List<Rule> RULES = List.of(
-			ingredient("clam", 0.95, "clam", "clams"),
-			ingredient("lobster", 0.95, "lobster", "lobsters"),
-			ingredient("crab", 0.95, "crab", "crabmeat"),
-			ingredient("shrimp", 0.95, "shrimp", "prawn", "prawns"),
-			ingredient("chicken", 0.95, "chicken"),
-			ingredient("beef", 0.90, "beef", "steak", "sirloin"),
-			ingredient("pork", 0.85, "pork", "bacon", "prosciutto"),
-			ingredient("cheese", 0.90, "cheese", "cheddar", "mozzarella", "feta", "provolone"),
-			ingredient("tomato", 0.95, "tomato", "tomatoes"),
-			ingredient("potato", 0.95, "potato", "potatoes", "fries"),
-			trait("creamy", 0.90, "creamy", "cream-based"),
-			trait("crispy", 0.90, "crispy", "crisp", "fried"),
-			trait("spicy", 0.90, "spicy", "hot peppers", "chili"),
-			trait("smoky", 0.90, "smoky", "smoked"),
-			trait("sweet", 0.85, "sweet", "honeyed"));
+			ingredient("clam", AttributeEvidenceType.DECLARED, 0.95, "clam", "clams"),
+			ingredient("lobster", AttributeEvidenceType.DECLARED, 0.95, "lobster", "lobsters"),
+			ingredient("crab", AttributeEvidenceType.DECLARED, 0.95, "crab", "crabmeat"),
+			ingredient("shrimp", AttributeEvidenceType.DECLARED, 0.95, "shrimp", "prawn", "prawns"),
+			ingredient("chicken", AttributeEvidenceType.DECLARED, 0.95, "chicken"),
+			ingredient("beef", AttributeEvidenceType.DECLARED, 0.95, "beef"),
+			ingredient("beef", AttributeEvidenceType.INFERRED, 0.85, "steak", "sirloin"),
+			ingredient("pork", AttributeEvidenceType.DECLARED, 0.95, "pork"),
+			ingredient("pork", AttributeEvidenceType.INFERRED, 0.85, "bacon", "prosciutto"),
+			ingredient("cheese", AttributeEvidenceType.DECLARED, 0.95, "cheese"),
+			ingredient("cheese", AttributeEvidenceType.INFERRED, 0.90, "cheddar", "mozzarella", "feta", "provolone"),
+			ingredient("tomato", AttributeEvidenceType.DECLARED, 0.95, "tomato", "tomatoes"),
+			ingredient("potato", AttributeEvidenceType.DECLARED, 0.95, "potato", "potatoes"),
+			ingredient("potato", AttributeEvidenceType.INFERRED, 0.85, "fries"),
+			trait("creamy", AttributeEvidenceType.DECLARED, 0.90, "creamy", "cream-based"),
+			trait("crispy", AttributeEvidenceType.DECLARED, 0.90, "crispy", "crisp"),
+			trait("crispy", AttributeEvidenceType.INFERRED, 0.80, "fried"),
+			trait("spicy", AttributeEvidenceType.DECLARED, 0.90, "spicy"),
+			trait("spicy", AttributeEvidenceType.INFERRED, 0.80, "hot peppers", "chili"),
+			trait("smoky", AttributeEvidenceType.DECLARED, 0.90, "smoky"),
+			trait("smoky", AttributeEvidenceType.INFERRED, 0.85, "smoked"),
+			trait("sweet", AttributeEvidenceType.DECLARED, 0.90, "sweet"),
+			trait("sweet", AttributeEvidenceType.INFERRED, 0.80, "honeyed"));
 
 	@Override
 	public List<DishAttributeCandidate> extract(MenuItemText item) {
@@ -41,25 +49,35 @@ public class RuleBasedDishAttributeExtractor implements DishAttributeExtractor {
 				DishAttributeCandidate candidate = new DishAttributeCandidate(
 						rule.type(),
 						rule.attributeKey(),
+						rule.evidenceType(),
 						rule.confidence(),
 						matcher.group());
-				candidates.put(rule.type() + ":" + rule.attributeKey(), candidate);
+				candidates.putIfAbsent(rule.type() + ":" + rule.attributeKey(), candidate);
 			}
 		}
 		return List.copyOf(candidates.values());
 	}
 
-	private static Rule ingredient(String key, double confidence, String... aliases) {
-		return rule(DishAttributeType.INGREDIENT, key, confidence, aliases);
+	private static Rule ingredient(
+			String key,
+			AttributeEvidenceType evidenceType,
+			double confidence,
+			String... aliases) {
+		return rule(DishAttributeType.INGREDIENT, key, evidenceType, confidence, aliases);
 	}
 
-	private static Rule trait(String key, double confidence, String... aliases) {
-		return rule(DishAttributeType.TRAIT, key, confidence, aliases);
+	private static Rule trait(
+			String key,
+			AttributeEvidenceType evidenceType,
+			double confidence,
+			String... aliases) {
+		return rule(DishAttributeType.TRAIT, key, evidenceType, confidence, aliases);
 	}
 
 	private static Rule rule(
 			DishAttributeType type,
 			String key,
+			AttributeEvidenceType evidenceType,
 			double confidence,
 			String... aliases) {
 		List<String> escapedAliases = new ArrayList<>();
@@ -68,12 +86,13 @@ public class RuleBasedDishAttributeExtractor implements DishAttributeExtractor {
 		}
 		Pattern pattern = Pattern.compile("(?<![\\p{L}\\p{N}_])(?:" + String.join("|", escapedAliases)
 				+ ")(?![\\p{L}\\p{N}_])");
-		return new Rule(type, key, confidence, pattern);
+		return new Rule(type, key, evidenceType, confidence, pattern);
 	}
 
 	private record Rule(
 			DishAttributeType type,
 			String attributeKey,
+			AttributeEvidenceType evidenceType,
 			double confidence,
 			Pattern pattern) {
 	}

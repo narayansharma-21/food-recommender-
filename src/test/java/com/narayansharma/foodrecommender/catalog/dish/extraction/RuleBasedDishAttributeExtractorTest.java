@@ -28,7 +28,13 @@ class RuleBasedDishAttributeExtractorTest {
 				.satisfies(candidate -> {
 					assertThat(candidate.matchedText()).isEqualTo("bacon");
 					assertThat(candidate.confidence()).isEqualTo(0.85);
+					assertThat(candidate.evidenceType()).isEqualTo(AttributeEvidenceType.INFERRED);
 				});
+		assertThat(candidates)
+				.filteredOn(candidate -> candidate.attributeKey().equals("clam"))
+				.singleElement()
+				.extracting(DishAttributeCandidate::evidenceType)
+				.isEqualTo(AttributeEvidenceType.DECLARED);
 	}
 
 	@Test
