@@ -149,7 +149,7 @@ Done when:
 
 ### 4.5 Menu Extraction Pipeline
 
-Status: Next milestone.
+Status: Proof-of-concept scope complete. Low-confidence review and correction workflows are deferred as agreed.
 
 Owns OCR, text parsing, structured extraction, and confidence.
 
@@ -160,8 +160,8 @@ Tasks:
 - `EXT-03`: Extract sections, dish names, descriptions, prices, and modifiers.
 - `EXT-04`: Validate extracted data against a strict schema.
 - `EXT-05`: Assign field-level confidence and provenance.
-- `EXT-06`: Send low-confidence items to user or administrator verification.
-- `EXT-07`: Keep the original extraction and corrected result.
+- `EXT-06`: Send low-confidence items to user or administrator verification. Deferred.
+- `EXT-07`: Keep the original extraction and corrected result. Original results and append-only revision storage are complete; correction APIs are deferred.
 - `EXT-08`: Build a small test set of real menus from the launch city.
 - `EXT-09`: Measure item, price, and section extraction accuracy.
 
@@ -170,6 +170,16 @@ Done when:
 - The pipeline can process an uploaded menu without blocking the request.
 - Users can correct uncertain values.
 - Extraction quality is measured against a fixed test set.
+
+Proof-of-concept delivery:
+
+- New menu versions enqueue extraction without blocking the upload request.
+- Local Tesseract handles JPEG and PNG images.
+- PDFBox uses embedded PDF text first and Tesseract for scanned pages.
+- Structured results, field confidence, provenance, and original JSON are stored.
+- Sections, items, prices, and modifiers are materialized for application queries.
+- A fixed official-source Greater Boston fixture set enforces at least 90% section, item-name, and price accuracy.
+- Human verification, corrections, and freshness remain later features.
 
 ### 4.6 Dish Knowledge
 
@@ -440,13 +450,12 @@ These are initial targets. Adjust them after testing with real launch-city menus
 
 ## 10. Decisions Still Needed During Planning
 
-- Launch city.
 - Authentication provider.
 - Cloud and object-storage provider.
-- Restaurant search source.
-- OCR provider.
 - Text-enrichment model provider.
 - Raw menu image retention period.
 - Minimum amount of feedback required before training the first ML model.
+
+Resolved for the proof of concept: Greater Boston, free Overture restaurant data, local filesystem object storage, and local Tesseract/PDFBox extraction. Hosted authentication and deployment remain free-tier choices for a later milestone.
 
 These choices do not prevent work on the core database and module contracts.

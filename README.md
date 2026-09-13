@@ -59,4 +59,15 @@ records remain separate from canonical restaurants until matching is implemented
 The application must display the attribution required by the datasets included in Overture. See the
 [Overture attribution guide](https://docs.overturemaps.org/attribution/) before distributing data.
 
+## Menu extraction proof of concept
+
+New captured menu versions queue a background extraction job. The local provider uses Tesseract for
+JPEG/PNG menu images and PDFBox for PDFs, falling back to Tesseract only for scanned PDF pages. Results
+are schema-validated, retain field confidence and source provenance, preserve the original extraction,
+and populate the queryable menu catalog.
+
+Tesseract runs inside the provided application container. For direct host execution, install Tesseract
+separately or set `TESSERACT_EXECUTABLE` to a trusted local binary. The Greater Boston parser accuracy
+fixtures run as part of `./gradlew check` and require at least 90% section, item-name, and price accuracy.
+
 See [the backend design plan](docs/BACKEND_DESIGN_PLAN.md) for scope, task IDs, and delivery phases.
