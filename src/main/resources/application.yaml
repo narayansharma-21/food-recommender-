@@ -48,3 +48,11 @@ catalog:
 menu:
   upload:
     max-bytes: ${MENU_UPLOAD_MAX_BYTES:10485760}
+
+ocr:
+  local:
+    provider-version: local-ocr-v1
+  tesseract:
+    executable: ${TESSERACT_EXECUTABLE:tesseract}
+    language: ${TESSERACT_LANGUAGE:eng}
+    timeout: ${TESSERACT_TIMEOUT:PT30S}
