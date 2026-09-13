@@ -29,6 +29,9 @@ logging:
       console: ${LOG_FORMAT:logstash}
 
 identity:
+  profile:
+    default-home-city: ${DEFAULT_HOME_CITY:Greater Boston}
+    default-locale: ${DEFAULT_USER_LOCALE:en-US}
   firebase:
     enabled: ${FIREBASE_AUTH_ENABLED:false}
     project-id: ${FIREBASE_PROJECT_ID:}
