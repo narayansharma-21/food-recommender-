@@ -48,6 +48,9 @@ catalog:
 dish:
   attributes:
     extraction-method: ${DISH_ATTRIBUTE_EXTRACTION_METHOD:rule-lexicon-v1}
+  matching:
+    review-minimum-confidence: ${DISH_MATCH_REVIEW_MINIMUM_CONFIDENCE:0.5}
+    auto-link-minimum-confidence: ${DISH_MATCH_AUTO_LINK_MINIMUM_CONFIDENCE:0.9}
   embeddings:
     local:
       dimensions: ${DISH_EMBEDDING_DIMENSIONS:128}
