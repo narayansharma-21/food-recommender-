@@ -31,7 +31,7 @@ class OriginalMenuExtractionStoreTest {
 		OcrResult ocrResult = new OcrResult(
 				"test_ocr",
 				"1",
-				List.of(new OcrPage(1, "ENTREES\nLobster Roll  Buttered roll  $29.00", 0.9)));
+				List.of(new OcrPage(1, "ENTREES\nLobster Roll  Buttered roll  $29.00\nAdd fries $4.00", 0.9)));
 		var extraction = textExtractor.extractWithEvidence(ocrResult);
 
 		StoredOriginalExtraction first = store.store(menuVersionId, ocrResult, extraction, "rules-v1");
@@ -53,6 +53,23 @@ class OriginalMenuExtractionStoreTest {
 				Integer.class,
 				menuVersionId);
 		assertThat(count).isEqualTo(1);
+		assertThat(jdbcTemplate.queryForObject(
+				"SELECT COUNT(*) FROM menu_sections WHERE menu_version_id = ?",
+				Integer.class,
+				menuVersionId)).isEqualTo(1);
+		assertThat(jdbcTemplate.queryForObject("""
+				SELECT COUNT(*)
+				FROM menu_items item
+				JOIN menu_sections section ON section.id = item.menu_section_id
+				WHERE section.menu_version_id = ? AND item.display_name = 'Lobster Roll'
+				""", Integer.class, menuVersionId)).isEqualTo(1);
+		assertThat(jdbcTemplate.queryForObject("""
+				SELECT COUNT(*)
+				FROM menu_item_modifiers modifier
+				JOIN menu_items item ON item.id = modifier.menu_item_id
+				JOIN menu_sections section ON section.id = item.menu_section_id
+				WHERE section.menu_version_id = ? AND modifier.display_name = 'Add fries'
+				""", Integer.class, menuVersionId)).isEqualTo(1);
 	}
 
 	private UUID insertMenuVersion() {
