@@ -125,7 +125,7 @@ Done when:
 
 ### 4.4 Menu Sources and Versioning
 
-Status: Next milestone.
+Status: Proof-of-concept scope complete through `MENU-05`. Verification, freshness, reporting, and admin review (`MENU-06` through `MENU-09`) are deferred.
 
 Owns menu sources, snapshots, versions, freshness, and publication state.
 
@@ -148,6 +148,8 @@ Done when:
 - The API reports source and freshness information.
 
 ### 4.5 Menu Extraction Pipeline
+
+Status: Next milestone.
 
 Owns OCR, text parsing, structured extraction, and confidence.
 
