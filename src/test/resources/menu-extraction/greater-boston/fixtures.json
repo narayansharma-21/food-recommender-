@@ -1,0 +1,68 @@
+[
+  {
+    "id": "legal-sea-foods-long-wharf",
+    "restaurant": "Legal Sea Foods - Long Wharf",
+    "municipality": "Boston",
+    "sourceUrl": "https://www.legalseafoods.com/locations/boston-long-wharf/menus/",
+    "capturedDate": "2026-09-12",
+    "ocrText": "RAW BAR\nOysters of the Day $3.50\nEdamame $8.00\nSALADS\nGreek Salad $15.00\nClassic Caesar Salad $14.00",
+    "expectedSections": [
+      {
+        "name": "RAW BAR",
+        "items": [
+          {"name": "Oysters of the Day", "price": "3.50"},
+          {"name": "Edamame", "price": "8.00"}
+        ]
+      },
+      {
+        "name": "SALADS",
+        "items": [
+          {"name": "Greek Salad", "price": "15.00"},
+          {"name": "Classic Caesar Salad", "price": "14.00"}
+        ]
+      }
+    ]
+  },
+  {
+    "id": "flour-boston-common-uncorked",
+    "restaurant": "Flour Bakery - Boston Common",
+    "municipality": "Boston",
+    "sourceUrl": "https://www.flourbakery.com/flour-uncorked",
+    "capturedDate": "2026-09-12",
+    "ocrText": "UNCORKED BRUNCH\nSmoked Salmon Salad Toast $16.00\nAvocado Toast $13.00\nBacon, Caramelized Onion, Goat Cheese Quiche $8.50",
+    "expectedSections": [
+      {
+        "name": "UNCORKED BRUNCH",
+        "items": [
+          {"name": "Smoked Salmon Salad Toast", "price": "16.00"},
+          {"name": "Avocado Toast", "price": "13.00"},
+          {"name": "Bacon, Caramelized Onion, Goat Cheese Quiche", "price": "8.50"}
+        ]
+      }
+    ]
+  },
+  {
+    "id": "sisters-caribbean-somerville",
+    "restaurant": "Sister's Caribbean Restaurant",
+    "municipality": "Somerville",
+    "sourceUrl": "https://sisterscaribbeanrestaurant.com/menu/",
+    "capturedDate": "2026-09-12",
+    "ocrText": "FRITAY\nFritay Poul Frit (Chicken) $23.00\nFritay Tass (Beef) $27.50\nSIDES\nSide of Chicken $14.25\nSide of Fried Green Plantains $9.25",
+    "expectedSections": [
+      {
+        "name": "FRITAY",
+        "items": [
+          {"name": "Fritay Poul Frit (Chicken)", "price": "23.00"},
+          {"name": "Fritay Tass (Beef)", "price": "27.50"}
+        ]
+      },
+      {
+        "name": "SIDES",
+        "items": [
+          {"name": "Side of Chicken", "price": "14.25"},
+          {"name": "Side of Fried Green Plantains", "price": "9.25"}
+        ]
+      }
+    ]
+  }
+]
