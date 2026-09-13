@@ -88,6 +88,23 @@ class RatingServiceTest {
 				.containsExactly("UPDATED", "CREATED");
 	}
 
+	@Test
+	void softDeletesFeedbackAndKeepsItsAuditHistory() {
+		UUID userId = insertUser();
+		UUID itemId = insertMenuItemWithDish().itemId();
+		UUID ratingId = ratingService.create(
+				userId, new SaveRatingRequest(itemId, 2, false, "Not for me", List.of("salty")));
+
+		ratingService.delete(userId, ratingId);
+
+		assertThatThrownBy(() -> ratingQueryService.get(userId, ratingId))
+				.isInstanceOf(ApiException.class);
+		assertThat(ratingQueryService.history(userId, ratingId))
+				.extracting(RatingRevisionView::changeType)
+				.containsExactly("DELETED", "CREATED");
+		assertThat(count("rating_comments", "rating_id", ratingId)).isZero();
+	}
+
 	private UUID insertUser() {
 		UUID id = UUID.randomUUID();
 		jdbcTemplate.update("""

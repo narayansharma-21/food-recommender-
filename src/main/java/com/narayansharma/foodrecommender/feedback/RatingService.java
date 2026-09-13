@@ -16,10 +16,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class RatingService {
 	private final JdbcTemplate jdbcTemplate;
 	private final Clock clock;
+	private final RatingQueryService ratingQueryService;
 
-	public RatingService(JdbcTemplate jdbcTemplate, Clock clock) {
+	public RatingService(JdbcTemplate jdbcTemplate, Clock clock, RatingQueryService ratingQueryService) {
 		this.jdbcTemplate = jdbcTemplate;
 		this.clock = clock;
+		this.ratingQueryService = ratingQueryService;
 	}
 
 	@Transactional
@@ -81,6 +83,35 @@ public class RatingService {
 		jdbcTemplate.update("DELETE FROM rating_tags WHERE rating_id = ?", ratingId);
 		writeTags("rating_tags", ratingId, tags, now);
 		writeRevision(ratingId, nextRevisionNumber(ratingId), "UPDATED", request, comment, tags, now);
+	}
+
+	@Transactional
+	public void delete(UUID userId, UUID ratingId) {
+		lockActiveUser(userId);
+		findOwnedActiveRatingMenuItem(userId, ratingId);
+		RatingView current = ratingQueryService.get(userId, ratingId);
+		Instant now = clock.instant();
+		jdbcTemplate.update(
+				"UPDATE ratings SET deleted_at = ?, updated_at = ? WHERE id = ?",
+				Timestamp.from(now),
+				Timestamp.from(now),
+				ratingId);
+		jdbcTemplate.update("DELETE FROM rating_comments WHERE rating_id = ?", ratingId);
+		jdbcTemplate.update("DELETE FROM rating_tags WHERE rating_id = ?", ratingId);
+		SaveRatingRequest snapshot = new SaveRatingRequest(
+				current.menuItemId(),
+				current.score(),
+				current.wouldOrderAgain(),
+				current.comment(),
+				current.tags());
+		writeRevision(
+				ratingId,
+				nextRevisionNumber(ratingId),
+				"DELETED",
+				snapshot,
+				current.comment(),
+				current.tags(),
+				now);
 	}
 
 	private void requireValidRequest(SaveRatingRequest request) {
