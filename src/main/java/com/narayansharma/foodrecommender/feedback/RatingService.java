@@ -18,16 +18,19 @@ public class RatingService {
 	private final Clock clock;
 	private final RatingQueryService ratingQueryService;
 	private final CommentTraitExtractor traitExtractor;
+	private final FeedbackChangedPublisher feedbackChangedPublisher;
 
 	public RatingService(
 			JdbcTemplate jdbcTemplate,
 			Clock clock,
 			RatingQueryService ratingQueryService,
-			CommentTraitExtractor traitExtractor) {
+			CommentTraitExtractor traitExtractor,
+			FeedbackChangedPublisher feedbackChangedPublisher) {
 		this.jdbcTemplate = jdbcTemplate;
 		this.clock = clock;
 		this.ratingQueryService = ratingQueryService;
 		this.traitExtractor = traitExtractor;
+		this.feedbackChangedPublisher = feedbackChangedPublisher;
 	}
 
 	@Transactional
@@ -63,7 +66,8 @@ public class RatingService {
 		writeComment(ratingId, comment, now);
 		writeTags("rating_tags", ratingId, tags, now);
 
-		writeRevision(ratingId, 1, "CREATED", request, comment, tags, now);
+		UUID revisionId = writeRevision(ratingId, 1, "CREATED", request, comment, tags, now);
+		feedbackChangedPublisher.publish(userId, ratingId, revisionId, "CREATED", now);
 		return ratingId;
 	}
 
@@ -88,7 +92,9 @@ public class RatingService {
 		writeComment(ratingId, comment, now);
 		jdbcTemplate.update("DELETE FROM rating_tags WHERE rating_id = ?", ratingId);
 		writeTags("rating_tags", ratingId, tags, now);
-		writeRevision(ratingId, nextRevisionNumber(ratingId), "UPDATED", request, comment, tags, now);
+		UUID revisionId = writeRevision(
+				ratingId, nextRevisionNumber(ratingId), "UPDATED", request, comment, tags, now);
+		feedbackChangedPublisher.publish(userId, ratingId, revisionId, "UPDATED", now);
 	}
 
 	@Transactional
@@ -110,7 +116,7 @@ public class RatingService {
 				current.wouldOrderAgain(),
 				current.comment(),
 				current.tags());
-		writeRevision(
+		UUID revisionId = writeRevision(
 				ratingId,
 				nextRevisionNumber(ratingId),
 				"DELETED",
@@ -118,6 +124,7 @@ public class RatingService {
 				current.comment(),
 				current.tags(),
 				now);
+		feedbackChangedPublisher.publish(userId, ratingId, revisionId, "DELETED", now);
 	}
 
 	private void requireValidRequest(SaveRatingRequest request) {
@@ -217,7 +224,7 @@ public class RatingService {
 		}
 	}
 
-	private void writeRevision(
+	private UUID writeRevision(
 			UUID ratingId,
 			int revisionNumber,
 			String changeType,
@@ -242,6 +249,7 @@ public class RatingService {
 				Timestamp.from(now));
 		writeTags("rating_revision_tags", revisionId, tags, now);
 		writeTraitSignals(revisionId, comment, now);
+		return revisionId;
 	}
 
 	private void writeTraitSignals(UUID revisionId, String comment, Instant now) {

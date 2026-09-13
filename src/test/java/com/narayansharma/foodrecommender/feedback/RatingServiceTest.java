@@ -42,6 +42,7 @@ class RatingServiceTest {
 				.isEqualTo("Great crispy crust");
 		assertThat(count("rating_tags", "rating_id", ratingId)).isEqualTo(2);
 		assertThat(count("rating_revisions", "rating_id", ratingId)).isEqualTo(1);
+		assertThat(count("feedback_change_events", "rating_id", ratingId)).isEqualTo(1);
 		assertThat(jdbcTemplate.queryForList("""
 				SELECT signal.trait_key
 				FROM rating_trait_signals signal
@@ -93,6 +94,7 @@ class RatingServiceTest {
 		assertThat(ratingQueryService.history(userId, ratingId))
 				.extracting(RatingRevisionView::changeType)
 				.containsExactly("UPDATED", "CREATED");
+		assertThat(count("feedback_change_events", "rating_id", ratingId)).isEqualTo(2);
 	}
 
 	@Test
@@ -110,6 +112,7 @@ class RatingServiceTest {
 				.extracting(RatingRevisionView::changeType)
 				.containsExactly("DELETED", "CREATED");
 		assertThat(count("rating_comments", "rating_id", ratingId)).isZero();
+		assertThat(count("feedback_change_events", "rating_id", ratingId)).isEqualTo(2);
 	}
 
 	private UUID insertUser() {
