@@ -19,6 +19,9 @@ class RatingServiceTest {
 	private RatingService ratingService;
 
 	@Autowired
+	private RatingQueryService ratingQueryService;
+
+	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
 	@Test
@@ -51,6 +54,20 @@ class RatingServiceTest {
 		assertThatThrownBy(() -> ratingService.create(userId, request))
 				.isInstanceOf(ApiException.class)
 				.hasMessage("A rating already exists for this menu item.");
+	}
+
+	@Test
+	void readsOnlyTheOwnersRatingAndHistory() {
+		UUID userId = insertUser();
+		UUID ratingId = ratingService.create(
+				userId,
+				new SaveRatingRequest(insertMenuItemWithDish().itemId(), 4, null, "Good", List.of("savory")));
+
+		assertThat(ratingQueryService.get(userId, ratingId).score()).isEqualTo(4);
+		assertThat(ratingQueryService.history(userId, ratingId)).hasSize(1);
+		assertThatThrownBy(() -> ratingQueryService.get(insertUser(), ratingId))
+				.isInstanceOf(ApiException.class)
+				.hasMessage("The rating was not found.");
 	}
 
 	private UUID insertUser() {
