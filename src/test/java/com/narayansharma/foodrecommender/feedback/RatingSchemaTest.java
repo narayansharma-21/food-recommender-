@@ -47,6 +47,26 @@ class RatingSchemaTest {
 				.isInstanceOf(DataIntegrityViolationException.class);
 	}
 
+	@Test
+	void keepsImmutableRatingRevisions() {
+		UUID ratingId = insertRating(insertUser(), insertMenuItem(), 4);
+		UUID revisionId = UUID.randomUUID();
+		jdbcTemplate.update("""
+				INSERT INTO rating_revisions (
+				    id, rating_id, revision_number, change_type, score,
+				    would_order_again, original_comment, created_at
+				) VALUES (?, ?, 1, 'CREATED', 4, TRUE, 'Very good', CURRENT_TIMESTAMP)
+				""", revisionId, ratingId);
+		jdbcTemplate.update("""
+				INSERT INTO rating_revision_tags (revision_id, tag_key)
+				VALUES (?, 'savory')
+				""", revisionId);
+
+		assertThat(jdbcTemplate.queryForObject(
+				"SELECT original_comment FROM rating_revisions WHERE id = ?", String.class, revisionId))
+				.isEqualTo("Very good");
+	}
+
 	private UUID insertUser() {
 		UUID id = UUID.randomUUID();
 		jdbcTemplate.update("""
