@@ -3,6 +3,7 @@ package com.narayansharma.foodrecommender.menu.extraction.structured;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.narayansharma.foodrecommender.menu.extraction.evidence.ProvenanceSource;
 import com.narayansharma.foodrecommender.menu.extraction.ocr.OcrPage;
 import com.narayansharma.foodrecommender.menu.extraction.ocr.OcrResult;
 import java.math.BigDecimal;
@@ -63,6 +64,38 @@ class RuleBasedMenuTextExtractorTest {
 		assertThatThrownBy(() -> extractor.extract(null))
 				.isInstanceOf(IllegalArgumentException.class)
 				.hasMessageContaining("OCR result");
+	}
+
+	@Test
+	void recordsFieldConfidenceAndSourceProvenance() {
+		OcrResult ocrResult = result("""
+				ENTREES
+				Fish and Chips  Cod and fries  $21.00
+				""");
+
+		var extraction = extractor.extractWithEvidence(ocrResult);
+
+		assertThat(extraction.fields())
+				.filteredOn(field -> field.path().equals("sections[0].items[0].name"))
+				.singleElement()
+				.satisfies(field -> {
+					assertThat(field.confidence()).isEqualTo(0.765);
+					assertThat(field.provenance()).singleElement().satisfies(provenance -> {
+						assertThat(provenance.source()).isEqualTo(ProvenanceSource.OCR_TEXT);
+						assertThat(provenance.pageNumber()).isEqualTo(1);
+						assertThat(provenance.sourceText()).contains("Fish and Chips");
+					});
+				});
+		assertThat(extraction.fields())
+				.filteredOn(field -> field.path().equals("sections[0].items[0].currency"))
+				.singleElement()
+				.satisfies(field -> {
+					assertThat(field.confidence()).isEqualTo(0.70);
+					assertThat(field.provenance()).singleElement().satisfies(provenance -> {
+						assertThat(provenance.source()).isEqualTo(ProvenanceSource.INFERRED);
+						assertThat(provenance.pageNumber()).isNull();
+					});
+				});
 	}
 
 	private OcrResult result(String text) {
