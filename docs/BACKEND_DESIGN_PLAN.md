@@ -183,6 +183,8 @@ Proof-of-concept delivery:
 
 ### 4.6 Dish Knowledge
 
+Status: Complete for the proof of concept.
+
 Owns reusable dish concepts, ingredients, cuisines, and traits.
 
 Tasks:
@@ -200,6 +202,14 @@ Done when:
 - Similar menu items can share a general dish concept.
 - Every extracted trait has provenance and confidence.
 - Embeddings can be regenerated without changing dish identity.
+
+Proof-of-concept delivery:
+
+- Menu items can link to reusable dish concepts with normalized ingredients, cuisines, preparations, and traits.
+- Rule-based extraction stores declared, inferred, and user-corrected evidence with confidence and provenance.
+- A free local hashing provider generates versioned embeddings behind a replaceable provider interface.
+- Uncertain matches enter an attributable review queue; approval links the item and closes competing suggestions.
+- Allergy decisions ignore inferred evidence. Missing proof remains unknown rather than being treated as safe.
 
 ### 4.7 Ratings and Comments
 
@@ -456,6 +466,6 @@ These are initial targets. Adjust them after testing with real launch-city menus
 - Raw menu image retention period.
 - Minimum amount of feedback required before training the first ML model.
 
-Resolved for the proof of concept: Greater Boston, free Overture restaurant data, local filesystem object storage, and local Tesseract/PDFBox extraction. Hosted authentication and deployment remain free-tier choices for a later milestone.
+Resolved for the proof of concept: Greater Boston, free Overture restaurant data, local filesystem object storage, local Tesseract/PDFBox extraction, rule-based text enrichment, and local hashing embeddings. Hosted authentication and deployment remain free-tier choices for a later milestone.
 
 These choices do not prevent work on the core database and module contracts.
