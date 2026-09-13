@@ -15,7 +15,7 @@ import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 
 @Service
-public class OriginalMenuExtractionStore {
+public class OriginalMenuExtractionStore implements MenuExtractionResultStore {
 	private final JdbcTemplate jdbcTemplate;
 	private final ObjectMapper objectMapper;
 	private final ExtractedMenuSchemaValidator schemaValidator;
@@ -33,6 +33,7 @@ public class OriginalMenuExtractionStore {
 	}
 
 	@Transactional
+	@Override
 	public StoredOriginalExtraction store(
 			UUID menuVersionId,
 			OcrResult ocrResult,

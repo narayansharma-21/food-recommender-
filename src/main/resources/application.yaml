@@ -46,6 +46,8 @@ catalog:
     snapshot: ${OVERTURE_PLACES_PATH:file:data/greater-boston-places.geojson}
 
 menu:
+  extraction:
+    parser-version: ${MENU_EXTRACTION_PARSER_VERSION:rules-v1}
   upload:
     max-bytes: ${MENU_UPLOAD_MAX_BYTES:10485760}
 
