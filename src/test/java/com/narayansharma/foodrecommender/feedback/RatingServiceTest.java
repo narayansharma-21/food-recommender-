@@ -32,16 +32,23 @@ class RatingServiceTest {
 		UUID ratingId = ratingService.create(
 				userId,
 				new SaveRatingRequest(
-						menu.itemId(), 5, true, "  Great crust  ", List.of("crispy", "crispy", "savory")));
+						menu.itemId(), 5, true, "  Great crispy crust  ", List.of("crispy", "crispy", "savory")));
 
 		assertThat(jdbcTemplate.queryForObject(
 				"SELECT dish_concept_id FROM ratings WHERE id = ?", UUID.class, ratingId))
 				.isEqualTo(menu.dishId());
 		assertThat(jdbcTemplate.queryForObject(
 				"SELECT original_text FROM rating_comments WHERE rating_id = ?", String.class, ratingId))
-				.isEqualTo("Great crust");
+				.isEqualTo("Great crispy crust");
 		assertThat(count("rating_tags", "rating_id", ratingId)).isEqualTo(2);
 		assertThat(count("rating_revisions", "rating_id", ratingId)).isEqualTo(1);
+		assertThat(jdbcTemplate.queryForList("""
+				SELECT signal.trait_key
+				FROM rating_trait_signals signal
+				JOIN rating_revisions revision ON revision.id = signal.revision_id
+				WHERE revision.rating_id = ?
+				ORDER BY signal.trait_key
+				""", String.class, ratingId)).containsExactly("crispy");
 	}
 
 	@Test

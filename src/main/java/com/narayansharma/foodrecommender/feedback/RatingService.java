@@ -17,11 +17,17 @@ public class RatingService {
 	private final JdbcTemplate jdbcTemplate;
 	private final Clock clock;
 	private final RatingQueryService ratingQueryService;
+	private final CommentTraitExtractor traitExtractor;
 
-	public RatingService(JdbcTemplate jdbcTemplate, Clock clock, RatingQueryService ratingQueryService) {
+	public RatingService(
+			JdbcTemplate jdbcTemplate,
+			Clock clock,
+			RatingQueryService ratingQueryService,
+			CommentTraitExtractor traitExtractor) {
 		this.jdbcTemplate = jdbcTemplate;
 		this.clock = clock;
 		this.ratingQueryService = ratingQueryService;
+		this.traitExtractor = traitExtractor;
 	}
 
 	@Transactional
@@ -235,6 +241,26 @@ public class RatingService {
 				comment,
 				Timestamp.from(now));
 		writeTags("rating_revision_tags", revisionId, tags, now);
+		writeTraitSignals(revisionId, comment, now);
+	}
+
+	private void writeTraitSignals(UUID revisionId, String comment, Instant now) {
+		for (ExtractedTraitSignal signal : traitExtractor.extract(comment)) {
+			jdbcTemplate.update("""
+					INSERT INTO rating_trait_signals (
+					    id, revision_id, trait_key, sentiment, confidence,
+					    evidence_text, extractor_version, created_at
+					) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+					""",
+					UUID.randomUUID(),
+					revisionId,
+					signal.traitKey(),
+					signal.sentiment(),
+					signal.confidence(),
+					signal.evidenceText(),
+					signal.extractorVersion(),
+					Timestamp.from(now));
+		}
 	}
 
 	private void writeTags(String table, UUID id, List<String> tags, Instant now) {
