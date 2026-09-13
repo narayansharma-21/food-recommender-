@@ -2,6 +2,7 @@ package com.narayansharma.foodrecommender.identity.auth;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -102,6 +103,30 @@ class IdentityAuthenticationFilterTest {
 						"""))
 				.andExpect(status().isBadRequest())
 				.andExpect(jsonPath("$.code").value("VALIDATION_FAILED"));
+	}
+
+	@Test
+	void validatesAuthenticatedRatingRequests() throws Exception {
+		mockMvc.perform(post("/v1/ratings")
+				.header("Authorization", "Bearer valid-token")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("""
+						{"menuItemId":"00000000-0000-0000-0000-000000000001","score":6}
+						"""))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.code").value("VALIDATION_FAILED"));
+	}
+
+	@Test
+	void reportsAnUnknownRatedMenuItem() throws Exception {
+		mockMvc.perform(post("/v1/ratings")
+				.header("Authorization", "Bearer valid-token")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("""
+						{"menuItemId":"00000000-0000-0000-0000-000000000001","score":5}
+						"""))
+				.andExpect(status().isNotFound())
+				.andExpect(jsonPath("$.code").value("MENU_ITEM_NOT_FOUND"));
 	}
 
 	@TestConfiguration(proxyBeanMethods = false)
