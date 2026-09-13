@@ -48,6 +48,10 @@ catalog:
 dish:
   attributes:
     extraction-method: ${DISH_ATTRIBUTE_EXTRACTION_METHOD:rule-lexicon-v1}
+  embeddings:
+    local:
+      dimensions: ${DISH_EMBEDDING_DIMENSIONS:128}
+      model-version: ${DISH_EMBEDDING_MODEL_VERSION:hashing-v1}
 
 menu:
   extraction:
