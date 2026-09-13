@@ -7,6 +7,7 @@ import com.narayansharma.foodrecommender.menu.version.CapturedMenuVersion;
 import com.narayansharma.foodrecommender.menu.version.MenuVersionCaptureService;
 import com.narayansharma.foodrecommender.platform.storage.ObjectStorage;
 import com.narayansharma.foodrecommender.platform.storage.StoredObject;
+import jakarta.persistence.EntityManager;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -51,6 +52,9 @@ class UserMenuImageSourceServiceTest {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
+	@Autowired
+	private EntityManager entityManager;
+
 	@BeforeEach
 	void insertMenu() {
 		jdbcTemplate.update("""
@@ -91,6 +95,7 @@ class UserMenuImageSourceServiceTest {
 				.isEqualTo(1);
 		assertThat(number("SELECT version_number FROM menu_versions WHERE id = ?", secondUpload.versionId()))
 				.isEqualTo(2);
+		assertThat(countExtractionJobs()).isEqualTo(2);
 	}
 
 	@Test
@@ -124,6 +129,7 @@ class UserMenuImageSourceServiceTest {
 		assertThat(changed.versionNumber()).isEqualTo(2);
 		assertThat(number("SELECT COUNT(*) FROM menu_versions WHERE source_id = ?", uploaded.sourceId()))
 				.isEqualTo(2);
+		assertThat(countExtractionJobs()).isEqualTo(2);
 	}
 
 	@Test
@@ -144,6 +150,13 @@ class UserMenuImageSourceServiceTest {
 
 	private Integer number(String sql, UUID id) {
 		return jdbcTemplate.queryForObject(sql, Integer.class, id);
+	}
+
+	private Integer countExtractionJobs() {
+		entityManager.flush();
+		return jdbcTemplate.queryForObject(
+				"SELECT COUNT(*) FROM background_jobs WHERE job_type = 'MENU_EXTRACTION'",
+				Integer.class);
 	}
 
 	@TestConfiguration(proxyBeanMethods = false)

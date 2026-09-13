@@ -1,5 +1,6 @@
 package com.narayansharma.foodrecommender.menu.version;
 
+import com.narayansharma.foodrecommender.menu.extraction.job.MenuExtractionJobQueue;
 import com.narayansharma.foodrecommender.platform.storage.StoredObject;
 import java.sql.Timestamp;
 import java.time.Clock;
@@ -19,10 +20,15 @@ public class MenuVersionCaptureService {
 
 	private final JdbcTemplate jdbcTemplate;
 	private final Clock clock;
+	private final MenuExtractionJobQueue extractionJobQueue;
 
-	public MenuVersionCaptureService(JdbcTemplate jdbcTemplate, Clock clock) {
+	public MenuVersionCaptureService(
+			JdbcTemplate jdbcTemplate,
+			Clock clock,
+			MenuExtractionJobQueue extractionJobQueue) {
 		this.jdbcTemplate = jdbcTemplate;
 		this.clock = clock;
+		this.extractionJobQueue = extractionJobQueue;
 	}
 
 	@Transactional
@@ -77,6 +83,7 @@ public class MenuVersionCaptureService {
 				rawObject.sha256(),
 				mediaType,
 				rawObject.size());
+		extractionJobQueue.enqueue(versionId);
 		return new CapturedMenuVersion(versionId, menuId, sourceId, nextVersion, capturedAt, true);
 	}
 
