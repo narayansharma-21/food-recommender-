@@ -16,7 +16,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class RequestIdFilter extends OncePerRequestFilter {
-	static final String MDC_KEY = "requestId";
+	public static final String MDC_KEY = "requestId";
 	static final String REQUEST_ID_HEADER = "X-Request-ID";
 	private static final Pattern VALID_REQUEST_ID = Pattern.compile("[A-Za-z0-9._-]{1,100}");
 
