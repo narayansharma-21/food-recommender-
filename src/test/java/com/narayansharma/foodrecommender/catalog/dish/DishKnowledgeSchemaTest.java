@@ -31,7 +31,7 @@ class DishKnowledgeSchemaTest {
 		jdbcTemplate.update("""
 				INSERT INTO ingredients (
 				    id, ingredient_key, display_name, normalized_name, created_at, updated_at
-				) VALUES (?, 'clam', 'Clam', 'clam', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+				) VALUES (?, 'scallop_schema_test', 'Scallop', 'scallop', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 				""", ingredientId);
 		jdbcTemplate.update("""
 				INSERT INTO cuisines (id, cuisine_key, display_name, created_at, updated_at)
@@ -44,7 +44,7 @@ class DishKnowledgeSchemaTest {
 		jdbcTemplate.update("""
 				INSERT INTO dish_traits (
 				    id, trait_key, display_name, trait_category, created_at, updated_at
-				) VALUES (?, 'creamy', 'Creamy', 'TEXTURE', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+				) VALUES (?, 'silky_schema_test', 'Silky', 'TEXTURE', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 				""", traitId);
 
 		jdbcTemplate.update(
