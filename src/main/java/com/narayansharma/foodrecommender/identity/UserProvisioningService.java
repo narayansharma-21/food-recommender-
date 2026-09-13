@@ -42,8 +42,12 @@ public class UserProvisioningService {
 		if (identity == null) {
 			throw new IllegalArgumentException("Verified identity is required");
 		}
-		lockProvisioningBucket(identity);
 		List<UserRow> existing = find(identity);
+		if (!existing.isEmpty()) {
+			return active(existing.getFirst(), false);
+		}
+		lockProvisioningBucket(identity);
+		existing = find(identity);
 		if (!existing.isEmpty()) {
 			return active(existing.getFirst(), false);
 		}
