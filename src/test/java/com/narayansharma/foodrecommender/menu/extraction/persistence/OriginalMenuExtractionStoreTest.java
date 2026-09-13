@@ -31,7 +31,7 @@ class OriginalMenuExtractionStoreTest {
 		OcrResult ocrResult = new OcrResult(
 				"test_ocr",
 				"1",
-				List.of(new OcrPage(1, "ENTREES\nLobster Roll  Buttered roll  $29.00\nAdd fries $4.00", 0.9)));
+				List.of(new OcrPage(1, "ENTREES\nLobster Roll  Smoked bacon  $29.00\nAdd fries $4.00", 0.9)));
 		var extraction = textExtractor.extractWithEvidence(ocrResult);
 
 		StoredOriginalExtraction first = store.store(menuVersionId, ocrResult, extraction, "rules-v1");
@@ -70,6 +70,23 @@ class OriginalMenuExtractionStoreTest {
 				JOIN menu_sections section ON section.id = item.menu_section_id
 				WHERE section.menu_version_id = ? AND modifier.display_name = 'Add fries'
 				""", Integer.class, menuVersionId)).isEqualTo(1);
+		assertThat(jdbcTemplate.queryForObject("""
+				SELECT COUNT(*)
+				FROM menu_item_ingredient_evidence evidence
+				JOIN ingredients ingredient ON ingredient.id = evidence.ingredient_id
+				WHERE evidence.menu_extraction_id = ?
+				  AND ingredient.ingredient_key = 'lobster'
+				  AND evidence.evidence_type = 'DECLARED'
+				""", Integer.class, first.id())).isEqualTo(1);
+		assertThat(jdbcTemplate.queryForObject("""
+				SELECT COUNT(*)
+				FROM menu_item_ingredient_evidence evidence
+				JOIN ingredients ingredient ON ingredient.id = evidence.ingredient_id
+				WHERE evidence.menu_extraction_id = ?
+				  AND ingredient.ingredient_key = 'pork'
+				  AND evidence.evidence_type = 'INFERRED'
+				  AND evidence.source_text = 'bacon'
+				""", Integer.class, first.id())).isEqualTo(1);
 	}
 
 	private UUID insertMenuVersion() {

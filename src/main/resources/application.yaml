@@ -45,6 +45,10 @@ catalog:
     minimum-records: ${OVERTURE_MINIMUM_RECORDS:100}
     snapshot: ${OVERTURE_PLACES_PATH:file:data/greater-boston-places.geojson}
 
+dish:
+  attributes:
+    extraction-method: ${DISH_ATTRIBUTE_EXTRACTION_METHOD:rule-lexicon-v1}
+
 menu:
   extraction:
     parser-version: ${MENU_EXTRACTION_PARSER_VERSION:rules-v1}

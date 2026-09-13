@@ -1,5 +1,7 @@
 package com.narayansharma.foodrecommender.menu.extraction.persistence;
 
+import com.narayansharma.foodrecommender.catalog.dish.extraction.MenuItemText;
+import com.narayansharma.foodrecommender.catalog.dish.persistence.MenuItemAttributeEvidenceStore;
 import com.narayansharma.foodrecommender.menu.extraction.evidence.AttributedExtractedMenu;
 import com.narayansharma.foodrecommender.menu.extraction.ocr.OcrResult;
 import com.narayansharma.foodrecommender.menu.extraction.structured.ExtractedMenu;
@@ -23,16 +25,19 @@ public class OriginalMenuExtractionStore implements MenuExtractionResultStore {
 	private final JdbcTemplate jdbcTemplate;
 	private final ObjectMapper objectMapper;
 	private final ExtractedMenuSchemaValidator schemaValidator;
+	private final MenuItemAttributeEvidenceStore attributeEvidenceStore;
 	private final Clock clock;
 
 	public OriginalMenuExtractionStore(
 			JdbcTemplate jdbcTemplate,
 			ObjectMapper objectMapper,
 			ExtractedMenuSchemaValidator schemaValidator,
+			MenuItemAttributeEvidenceStore attributeEvidenceStore,
 			Clock clock) {
 		this.jdbcTemplate = jdbcTemplate;
 		this.objectMapper = objectMapper;
 		this.schemaValidator = schemaValidator;
+		this.attributeEvidenceStore = attributeEvidenceStore;
 		this.clock = clock;
 	}
 
@@ -70,11 +75,11 @@ public class OriginalMenuExtractionStore implements MenuExtractionResultStore {
 				serialize(extraction.menu()),
 				serialize(extraction.fields()),
 				Timestamp.from(createdAt));
-		materialize(menuVersionId, extraction.menu());
+		materialize(extractionId, menuVersionId, extraction.menu());
 		return new StoredOriginalExtraction(extractionId, menuVersionId, createdAt, true);
 	}
 
-	private void materialize(UUID menuVersionId, ExtractedMenu menu) {
+	private void materialize(UUID extractionId, UUID menuVersionId, ExtractedMenu menu) {
 		Integer existingSections = jdbcTemplate.queryForObject(
 				"SELECT COUNT(*) FROM menu_sections WHERE menu_version_id = ?",
 				Integer.class,
@@ -89,11 +94,11 @@ public class OriginalMenuExtractionStore implements MenuExtractionResultStore {
 					INSERT INTO menu_sections (id, menu_version_id, display_name, display_order)
 					VALUES (?, ?, ?, ?)
 					""", sectionId, menuVersionId, section.name(), sectionIndex);
-			materializeItems(sectionId, section);
+			materializeItems(extractionId, sectionId, section);
 		}
 	}
 
-	private void materializeItems(UUID sectionId, ExtractedMenuSection section) {
+	private void materializeItems(UUID extractionId, UUID sectionId, ExtractedMenuSection section) {
 		for (int itemIndex = 0; itemIndex < section.items().size(); itemIndex++) {
 			ExtractedMenuItem item = section.items().get(itemIndex);
 			UUID itemId = UUID.randomUUID();
@@ -110,6 +115,10 @@ public class OriginalMenuExtractionStore implements MenuExtractionResultStore {
 					item.price(),
 					item.currency(),
 					itemIndex);
+			attributeEvidenceStore.record(
+					extractionId,
+					itemId,
+					new MenuItemText(item.name(), item.description()));
 			materializeModifiers(itemId, item.modifiers());
 		}
 	}
