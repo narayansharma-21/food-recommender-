@@ -21,10 +21,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class RatingController {
 	private final RatingService ratingService;
 	private final RatingQueryService ratingQueryService;
+	private final RatingModerationService moderationService;
 
-	public RatingController(RatingService ratingService, RatingQueryService ratingQueryService) {
+	public RatingController(
+			RatingService ratingService,
+			RatingQueryService ratingQueryService,
+			RatingModerationService moderationService) {
 		this.ratingService = ratingService;
 		this.ratingQueryService = ratingQueryService;
+		this.moderationService = moderationService;
 	}
 
 	@PostMapping
@@ -65,5 +70,13 @@ public class RatingController {
 			@AuthenticationPrincipal UserPrincipal principal,
 			@PathVariable UUID ratingId) {
 		return ratingQueryService.history(principal.userId(), ratingId);
+	}
+
+	@PostMapping("/{ratingId}/reports")
+	public ResponseEntity<ReportRatingResponse> report(
+			@AuthenticationPrincipal UserPrincipal principal,
+			@PathVariable UUID ratingId,
+			@Valid @RequestBody ReportRatingRequest request) {
+		return ResponseEntity.accepted().body(moderationService.report(principal.userId(), ratingId, request));
 	}
 }

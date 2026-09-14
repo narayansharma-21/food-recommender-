@@ -22,6 +22,9 @@ class RatingServiceTest {
 	private RatingQueryService ratingQueryService;
 
 	@Autowired
+	private RatingModerationService moderationService;
+
+	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
 	@Test
@@ -113,6 +116,20 @@ class RatingServiceTest {
 				.containsExactly("DELETED", "CREATED");
 		assertThat(count("rating_comments", "rating_id", ratingId)).isZero();
 		assertThat(count("feedback_change_events", "rating_id", ratingId)).isEqualTo(2);
+	}
+
+	@Test
+	void opensAModerationCaseForOwnedFeedback() {
+		UUID userId = insertUser();
+		UUID ratingId = ratingService.create(
+				userId,
+				new SaveRatingRequest(insertMenuItemWithDish().itemId(), 3, null, "Fine", List.of()));
+
+		ReportRatingResponse report = moderationService.report(
+				userId, ratingId, new ReportRatingRequest("OTHER", "Needs review"));
+
+		assertThat(report.status()).isEqualTo("OPEN");
+		assertThat(count("rating_moderation_cases", "rating_id", ratingId)).isEqualTo(1);
 	}
 
 	private UUID insertUser() {
