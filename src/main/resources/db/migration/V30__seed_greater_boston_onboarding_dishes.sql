@@ -1,0 +1,31 @@
+INSERT INTO dish_concepts (
+    id, concept_key, display_name, normalized_name, created_at, updated_at
+) VALUES
+    ('10000000-0000-0000-0000-000000000001', 'lobster_roll', 'Lobster Roll', 'lobster roll', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('10000000-0000-0000-0000-000000000002', 'new_england_clam_chowder', 'New England Clam Chowder', 'new england clam chowder', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('10000000-0000-0000-0000-000000000003', 'pizza', 'Pizza', 'pizza', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('10000000-0000-0000-0000-000000000004', 'cheeseburger', 'Cheeseburger', 'cheeseburger', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('10000000-0000-0000-0000-000000000005', 'tacos', 'Tacos', 'tacos', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('10000000-0000-0000-0000-000000000006', 'sushi', 'Sushi', 'sushi', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('10000000-0000-0000-0000-000000000007', 'ramen', 'Ramen', 'ramen', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('10000000-0000-0000-0000-000000000008', 'pad_thai', 'Pad Thai', 'pad thai', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('10000000-0000-0000-0000-000000000009', 'chicken_tikka_masala', 'Chicken Tikka Masala', 'chicken tikka masala', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('10000000-0000-0000-0000-000000000010', 'falafel', 'Falafel', 'falafel', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('10000000-0000-0000-0000-000000000011', 'pho', 'Pho', 'pho', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('10000000-0000-0000-0000-000000000012', 'caesar_salad', 'Caesar Salad', 'caesar salad', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+INSERT INTO onboarding_dishes (
+    id, dish_concept_id, launch_city, prompt, display_order, active, created_at
+) VALUES
+    ('20000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000001', 'Greater Boston', 'How much do you like lobster rolls?', 0, TRUE, CURRENT_TIMESTAMP),
+    ('20000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000002', 'Greater Boston', 'How much do you like clam chowder?', 1, TRUE, CURRENT_TIMESTAMP),
+    ('20000000-0000-0000-0000-000000000003', '10000000-0000-0000-0000-000000000003', 'Greater Boston', 'How much do you like pizza?', 2, TRUE, CURRENT_TIMESTAMP),
+    ('20000000-0000-0000-0000-000000000004', '10000000-0000-0000-0000-000000000004', 'Greater Boston', 'How much do you like cheeseburgers?', 3, TRUE, CURRENT_TIMESTAMP),
+    ('20000000-0000-0000-0000-000000000005', '10000000-0000-0000-0000-000000000005', 'Greater Boston', 'How much do you like tacos?', 4, TRUE, CURRENT_TIMESTAMP),
+    ('20000000-0000-0000-0000-000000000006', '10000000-0000-0000-0000-000000000006', 'Greater Boston', 'How much do you like sushi?', 5, TRUE, CURRENT_TIMESTAMP),
+    ('20000000-0000-0000-0000-000000000007', '10000000-0000-0000-0000-000000000007', 'Greater Boston', 'How much do you like ramen?', 6, TRUE, CURRENT_TIMESTAMP),
+    ('20000000-0000-0000-0000-000000000008', '10000000-0000-0000-0000-000000000008', 'Greater Boston', 'How much do you like pad thai?', 7, TRUE, CURRENT_TIMESTAMP),
+    ('20000000-0000-0000-0000-000000000009', '10000000-0000-0000-0000-000000000009', 'Greater Boston', 'How much do you like chicken tikka masala?', 8, TRUE, CURRENT_TIMESTAMP),
+    ('20000000-0000-0000-0000-000000000010', '10000000-0000-0000-0000-000000000010', 'Greater Boston', 'How much do you like falafel?', 9, TRUE, CURRENT_TIMESTAMP),
+    ('20000000-0000-0000-0000-000000000011', '10000000-0000-0000-0000-000000000011', 'Greater Boston', 'How much do you like pho?', 10, TRUE, CURRENT_TIMESTAMP),
+    ('20000000-0000-0000-0000-000000000012', '10000000-0000-0000-0000-000000000012', 'Greater Boston', 'How much do you like Caesar salad?', 11, TRUE, CURRENT_TIMESTAMP);
