@@ -16,6 +16,12 @@ class TasteProfileSchemaTest {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
+	@Autowired
+	private OnboardingService onboardingService;
+
+	@Autowired
+	private TasteProfileCalculator calculator;
+
 	@Test
 	void storesVersionedFeaturesWithTraceableEvidence() {
 		UUID userId = UUID.randomUUID();
@@ -44,5 +50,31 @@ class TasteProfileSchemaTest {
 		assertThat(jdbcTemplate.queryForObject(
 				"SELECT evidence_count FROM taste_profile_features WHERE id = ?", Integer.class, featureId))
 				.isEqualTo(1);
+	}
+
+	@Test
+	void calculatesAShrunkCuisinePreferenceFromOnboarding() {
+		UUID userId = UUID.randomUUID();
+		jdbcTemplate.update("""
+				INSERT INTO users (id, status, created_at, updated_at)
+				VALUES (?, 'ACTIVE', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+				""", userId);
+		UUID lobsterRollQuestion = onboardingService.unansweredQuestions(userId).getFirst().onboardingDishId();
+		onboardingService.saveResponse(
+				userId, lobsterRollQuestion, new SaveOnboardingResponseRequest(5));
+
+		calculator.recalculate(userId);
+
+		assertThat(jdbcTemplate.queryForObject("""
+				SELECT preference_score
+				FROM taste_profile_features
+				WHERE user_id = ? AND feature_type = 'CUISINE' AND feature_key = 'new_england'
+				""", BigDecimal.class, userId)).isEqualByComparingTo(new BigDecimal("0.333333"));
+		assertThat(jdbcTemplate.queryForObject("""
+				SELECT COUNT(*)
+				FROM taste_profile_evidence evidence
+				JOIN taste_profile_features feature ON feature.id = evidence.feature_id
+				WHERE feature.user_id = ? AND evidence.source_type = 'ONBOARDING_RESPONSE'
+				""", Integer.class, userId)).isEqualTo(1);
 	}
 }
