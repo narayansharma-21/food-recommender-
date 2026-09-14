@@ -22,6 +22,9 @@ class TasteProfileSchemaTest {
 	@Autowired
 	private TasteProfileCalculator calculator;
 
+	@Autowired
+	private TasteProfileQueryService queryService;
+
 	@Test
 	void storesVersionedFeaturesWithTraceableEvidence() {
 		UUID userId = UUID.randomUUID();
@@ -76,5 +79,9 @@ class TasteProfileSchemaTest {
 				JOIN taste_profile_features feature ON feature.id = evidence.feature_id
 				WHERE feature.user_id = ? AND evidence.source_type = 'ONBOARDING_RESPONSE'
 				""", Integer.class, userId)).isEqualTo(1);
+		TasteProfileView profile = queryService.get(userId);
+		assertThat(profile.calculationVersion()).isEqualTo("weighted-v1");
+		assertThat(profile.features()).singleElement()
+				.satisfies(feature -> assertThat(feature.evidence()).hasSize(1));
 	}
 }
