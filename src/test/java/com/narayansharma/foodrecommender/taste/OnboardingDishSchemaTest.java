@@ -33,6 +33,12 @@ class OnboardingDishSchemaTest {
 				JOIN dish_concept_cuisines mapping ON mapping.dish_concept_id = onboarding.dish_concept_id
 				WHERE onboarding.launch_city = 'Greater Boston'
 				""", Integer.class)).isEqualTo(12);
+		assertThat(jdbcTemplate.queryForObject("""
+				SELECT COUNT(*)
+				FROM onboarding_dishes onboarding
+				JOIN dish_concept_ingredients mapping ON mapping.dish_concept_id = onboarding.dish_concept_id
+				WHERE onboarding.launch_city = 'Greater Boston'
+				""", Integer.class)).isEqualTo(12);
 	}
 
 	@Test
