@@ -16,10 +16,15 @@ public class OnboardingService {
 	static final String LAUNCH_CITY = "Greater Boston";
 	private final JdbcTemplate jdbcTemplate;
 	private final Clock clock;
+	private final TasteProfileCalculator profileCalculator;
 
-	public OnboardingService(JdbcTemplate jdbcTemplate, Clock clock) {
+	public OnboardingService(
+			JdbcTemplate jdbcTemplate,
+			Clock clock,
+			TasteProfileCalculator profileCalculator) {
 		this.jdbcTemplate = jdbcTemplate;
 		this.clock = clock;
+		this.profileCalculator = profileCalculator;
 	}
 
 	@Transactional
@@ -53,6 +58,7 @@ public class OnboardingService {
 					WHERE id = ?
 					""", request.preferenceScore(), Timestamp.from(now), responseId);
 		}
+		profileCalculator.recalculate(userId);
 		return new OnboardingResponseView(responseId, onboardingDishId, request.preferenceScore(), now);
 	}
 

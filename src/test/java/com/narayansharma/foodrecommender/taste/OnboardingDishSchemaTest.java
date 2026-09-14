@@ -59,6 +59,10 @@ class OnboardingDishSchemaTest {
 		assertThat(updated.id()).isEqualTo(first.id());
 		assertThat(updated.preferenceScore()).isEqualTo(5);
 		assertThat(onboardingService.unansweredQuestions(userId)).hasSize(11);
+		assertThat(jdbcTemplate.queryForObject(
+				"SELECT COUNT(*) FROM taste_profile_features WHERE user_id = ?",
+				Integer.class,
+				userId)).isEqualTo(1);
 	}
 
 	private UUID insertUser() {
