@@ -242,6 +242,15 @@ Done when:
 - Corrections do not erase audit history.
 - Comment-derived signals show their source and confidence.
 
+Proof-of-concept delivery:
+
+- Authenticated users can create, read, update, delete, and review the history of their own ratings.
+- Ratings use a 1–5 score and retain the exact menu item plus its dish concept when one is known.
+- Original comments and tags stay separate from versioned, rule-derived trait sentiment.
+- Updates and deletes append immutable revisions instead of replacing history.
+- Moderation cases provide an abuse-reporting hook for feedback visible to the reporting user.
+- Every change writes a transactional outbox event for the future taste-profile processor.
+
 ### 4.8 Onboarding and Taste Profiles
 
 Owns cold-start questions and interpretable user preferences.

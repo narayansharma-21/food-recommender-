@@ -88,4 +88,10 @@ Firebase user to a separate internal user ID.
 See the [official Firebase Admin setup guide](https://firebase.google.com/docs/admin/setup) for project
 and credential setup.
 
+## Ratings proof of concept
+
+Authenticated users can manage their own 1–5 ratings through `/v1/ratings`. Each rating remains tied to
+the exact menu item, keeps an immutable change history, and stores the original comment separately from
+simple derived trait signals. Rating changes are recorded in an outbox for later taste-profile updates.
+
 See [the backend design plan](docs/BACKEND_DESIGN_PLAN.md) for scope, task IDs, and delivery phases.
