@@ -31,16 +31,36 @@ class OnboardingDishSchemaTest {
 
 	@Test
 	void returnsTheOrderedQuestionSetToAnActiveUser() {
-		UUID userId = UUID.randomUUID();
-		jdbcTemplate.update("""
-				INSERT INTO users (id, status, created_at, updated_at)
-				VALUES (?, 'ACTIVE', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-				""", userId);
+		UUID userId = insertUser();
 
 		assertThat(onboardingService.unansweredQuestions(userId))
 				.hasSize(12)
 				.first()
 				.extracting(OnboardingDishQuestion::dishName)
 				.isEqualTo("Lobster Roll");
+	}
+
+	@Test
+	void savesAndUpdatesAUsersOnboardingAnswer() {
+		UUID userId = insertUser();
+		UUID dishId = onboardingService.unansweredQuestions(userId).getFirst().onboardingDishId();
+
+		OnboardingResponseView first = onboardingService.saveResponse(
+				userId, dishId, new SaveOnboardingResponseRequest(4));
+		OnboardingResponseView updated = onboardingService.saveResponse(
+				userId, dishId, new SaveOnboardingResponseRequest(5));
+
+		assertThat(updated.id()).isEqualTo(first.id());
+		assertThat(updated.preferenceScore()).isEqualTo(5);
+		assertThat(onboardingService.unansweredQuestions(userId)).hasSize(11);
+	}
+
+	private UUID insertUser() {
+		UUID userId = UUID.randomUUID();
+		jdbcTemplate.update("""
+				INSERT INTO users (id, status, created_at, updated_at)
+				VALUES (?, 'ACTIVE', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+				""", userId);
+		return userId;
 	}
 }
