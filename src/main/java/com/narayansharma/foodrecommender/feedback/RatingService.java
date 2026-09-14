@@ -162,7 +162,11 @@ public class RatingService {
 
 	private boolean ratingExists(UUID userId, UUID menuItemId) {
 		Integer count = jdbcTemplate.queryForObject(
-				"SELECT COUNT(*) FROM ratings WHERE user_id = ? AND menu_item_id = ?",
+				"""
+				SELECT COUNT(*)
+				FROM ratings
+				WHERE user_id = ? AND menu_item_id = ? AND deleted_at IS NULL
+				""",
 				Integer.class,
 				userId,
 				menuItemId);

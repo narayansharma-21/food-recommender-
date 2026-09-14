@@ -132,6 +132,20 @@ class RatingServiceTest {
 		assertThat(count("rating_moderation_cases", "rating_id", ratingId)).isEqualTo(1);
 	}
 
+	@Test
+	void allowsANewRatingAfterThePreviousOneIsDeleted() {
+		UUID userId = insertUser();
+		UUID itemId = insertMenuItemWithDish().itemId();
+		SaveRatingRequest request = new SaveRatingRequest(itemId, 4, true, null, List.of());
+		UUID deletedRatingId = ratingService.create(userId, request);
+		ratingService.delete(userId, deletedRatingId);
+
+		UUID newRatingId = ratingService.create(userId, request);
+
+		assertThat(newRatingId).isNotEqualTo(deletedRatingId);
+		assertThat(ratingQueryService.get(userId, newRatingId).score()).isEqualTo(4);
+	}
+
 	private UUID insertUser() {
 		UUID id = UUID.randomUUID();
 		jdbcTemplate.update("""
