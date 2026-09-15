@@ -11,7 +11,7 @@ class WeightedRecommendationScorerTest {
 	@Test
 	void safeBetPrioritizesKnownPreferenceAndPopularity() {
 		RecommendationSignals signals = new RecommendationSignals(
-				new BigDecimal("0.600000"), new BigDecimal("0.800000"), 4, true);
+				new BigDecimal("0.600000"), new BigDecimal("0.800000"), 4, 2, true);
 
 		assertThat(scorer.score(RecommendationMode.SAFE_BET, signals))
 				.isEqualTo(new ScoredRecommendation(new BigDecimal("0.660000"), "HIGH"));
@@ -20,7 +20,7 @@ class WeightedRecommendationScorerTest {
 	@Test
 	void trySomethingNewAddsANoveltyBonus() {
 		RecommendationSignals signals = new RecommendationSignals(
-				new BigDecimal("0.200000"), new BigDecimal("0.500000"), 1, false);
+				new BigDecimal("0.200000"), new BigDecimal("0.500000"), 1, 0, false);
 
 		assertThat(scorer.score(RecommendationMode.TRY_SOMETHING_NEW, signals))
 				.isEqualTo(new ScoredRecommendation(new BigDecimal("0.500000"), "MEDIUM"));
@@ -29,7 +29,7 @@ class WeightedRecommendationScorerTest {
 	@Test
 	void coldStartStillProducesALowConfidenceScore() {
 		RecommendationSignals signals = new RecommendationSignals(
-				BigDecimal.ZERO, new BigDecimal("0.500000"), 0, false);
+				BigDecimal.ZERO, new BigDecimal("0.500000"), 0, 0, false);
 
 		assertThat(scorer.score(RecommendationMode.SAFE_BET, signals))
 				.isEqualTo(new ScoredRecommendation(new BigDecimal("0.150000"), "LOW"));

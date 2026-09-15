@@ -6,5 +6,6 @@ public record RecommendationSignals(
 		BigDecimal personalPreference,
 		BigDecimal popularity,
 		int evidenceCount,
+		int popularityRatingCount,
 		boolean previouslyRated) {
 }

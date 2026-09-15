@@ -26,6 +26,7 @@ public class RecommendationSignalService {
 				personal,
 				bayesianPopularity(popularity),
 				evidenceCount,
+				popularity.ratingCount(),
 				previouslyRated(userId, candidate));
 	}
 

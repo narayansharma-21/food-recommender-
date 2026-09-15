@@ -19,9 +19,10 @@ public class WeightedRecommendationScorer {
 					.add(popularity.multiply(new BigDecimal("0.200000")))
 					.add(signals.previouslyRated() ? BigDecimal.ZERO : new BigDecimal("0.300000"));
 		};
-		String confidence = signals.evidenceCount() >= 3
+		int totalEvidence = signals.evidenceCount() + signals.popularityRatingCount();
+		String confidence = totalEvidence >= 3
 				? "HIGH"
-				: signals.evidenceCount() > 0 ? "MEDIUM" : "LOW";
+				: totalEvidence > 0 ? "MEDIUM" : "LOW";
 		return new ScoredRecommendation(score.setScale(6, RoundingMode.HALF_UP), confidence);
 	}
 

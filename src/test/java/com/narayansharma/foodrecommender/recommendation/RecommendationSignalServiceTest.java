@@ -44,6 +44,7 @@ class RecommendationSignalServiceTest {
 		assertThat(signals.personalPreference()).isEqualByComparingTo(new BigDecimal("0.500000"));
 		assertThat(signals.popularity()).isEqualByComparingTo(new BigDecimal("0.625000"));
 		assertThat(signals.evidenceCount()).isEqualTo(2);
+		assertThat(signals.popularityRatingCount()).isZero();
 		assertThat(signals.previouslyRated()).isFalse();
 	}
 }
