@@ -92,6 +92,12 @@ and credential setup.
 
 Authenticated users can manage their own 1–5 ratings through `/v1/ratings`. Each rating remains tied to
 the exact menu item, keeps an immutable change history, and stores the original comment separately from
-simple derived trait signals. Rating changes are recorded in an outbox for later taste-profile updates.
+simple derived trait signals. Rating changes are recorded and refresh the user's taste profile transactionally.
+
+## Taste-profile proof of concept
+
+Authenticated users receive 12 Greater Boston onboarding questions from `/v1/onboarding/dishes`.
+Their answers and later ratings create an explainable taste profile covering cuisines, ingredients,
+preparations, and traits. Sparse preferences are kept near neutral until more evidence is collected.
 
 See [the backend design plan](docs/BACKEND_DESIGN_PLAN.md) for scope, task IDs, and delivery phases.

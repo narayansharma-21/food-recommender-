@@ -271,6 +271,15 @@ Done when:
 - New ratings update the profile.
 - Every displayed preference can be traced to supporting ratings.
 
+Proof-of-concept delivery:
+
+- Greater Boston onboarding asks 12 questions across a diverse set of familiar dishes.
+- Answers and ratings produce cuisine, ingredient, preparation, and trait preferences.
+- Sparse evidence is shrunk toward neutral so one answer cannot dominate a profile.
+- Profiles recalculate transactionally after onboarding answers and rating changes.
+- Stored calculation versions and evidence links explain every returned preference.
+- Authenticated users can read their profile at `/v1/users/me/taste-profile`.
+
 ### 4.9 Recommendation Engine
 
 Owns filtering, scoring, ranking modes, confidence, and explanations.
