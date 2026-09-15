@@ -21,7 +21,7 @@ class MenuItemDishConceptSchemaTest {
 		jdbcTemplate.update("""
 				INSERT INTO dish_concepts (
 				    id, concept_key, display_name, normalized_name, created_at, updated_at
-				) VALUES (?, 'lobster_roll', 'Lobster Roll', 'lobster roll', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+				) VALUES (?, 'lobster_roll_schema_test', 'Lobster Roll', 'lobster roll', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 				""", dishConceptId);
 		UUID sectionId = insertMenuSection();
 		UUID matchedItemId = UUID.randomUUID();
