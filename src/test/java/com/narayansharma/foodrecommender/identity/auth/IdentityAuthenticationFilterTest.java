@@ -118,6 +118,18 @@ class IdentityAuthenticationFilterTest {
 	}
 
 	@Test
+	void validatesAuthenticatedRecommendationRequests() throws Exception {
+		mockMvc.perform(post("/v1/restaurants/00000000-0000-0000-0000-000000000001/recommendations")
+				.header("Authorization", "Bearer valid-token")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("""
+						{"mode":"SAFE_BET","limit":26}
+						"""))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.code").value("VALIDATION_FAILED"));
+	}
+
+	@Test
 	void reportsAnUnknownRatedMenuItem() throws Exception {
 		mockMvc.perform(post("/v1/ratings")
 				.header("Authorization", "Bearer valid-token")
