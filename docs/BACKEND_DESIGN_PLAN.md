@@ -304,6 +304,14 @@ Done when:
 - The same inputs and version produce the same ranking.
 - Every result includes confidence and at least one evidence-based reason.
 
+Proof-of-concept delivery:
+
+- Authenticated users can request Safe Bet or Try Something New rankings for the latest captured menu.
+- Allergy evidence fails closed, and supported dietary rules remove known conflicts before scoring.
+- Weighted taste, Bayesian popularity, and novelty signals produce deterministic rankings.
+- Cold-start users receive low-confidence current-menu results instead of an error.
+- Every request stores its menu, ranking, and taste-feature versions plus ordered results and reasons.
+
 ### 4.10 ML Training and Evaluation
 
 Owns datasets, model training, evaluation, and versioned model artifacts.

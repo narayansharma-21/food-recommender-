@@ -100,4 +100,17 @@ Authenticated users receive 12 Greater Boston onboarding questions from `/v1/onb
 Their answers and later ratings create an explainable taste profile covering cuisines, ingredients,
 preparations, and traits. Sparse preferences are kept near neutral until more evidence is collected.
 
+## Recommendations proof of concept
+
+Authenticated users can rank a restaurant's current menu with:
+
+```text
+POST /v1/restaurants/{restaurantId}/recommendations
+{"mode":"SAFE_BET","limit":10}
+```
+
+`TRY_SOMETHING_NEW` is also supported. Dietary and allergy rules run before scoring. Responses include
+confidence, short reasons, and the menu, ranking, and taste-feature versions used. Each response is saved
+as an impression for later evaluation.
+
 See [the backend design plan](docs/BACKEND_DESIGN_PLAN.md) for scope, task IDs, and delivery phases.
