@@ -57,6 +57,19 @@ public class RecommendationImpressionStore {
 				rank,
 				ranked.score().score(),
 				ranked.score().confidence());
+		RecommendationSignals signals = ranked.signals();
+		jdbcTemplate.update("""
+				INSERT INTO recommendation_result_features (
+				    result_id, personal_preference, popularity, taste_evidence_count,
+				    popularity_rating_count, previously_rated
+				) VALUES (?, ?, ?, ?, ?, ?)
+				""",
+				resultId,
+				signals.personalPreference(),
+				signals.popularity(),
+				signals.evidenceCount(),
+				signals.popularityRatingCount(),
+				signals.previouslyRated());
 		for (int index = 0; index < ranked.explanations().size(); index++) {
 			RecommendationExplanation explanation = ranked.explanations().get(index);
 			jdbcTemplate.update("""

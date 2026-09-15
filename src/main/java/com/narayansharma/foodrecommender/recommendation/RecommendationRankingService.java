@@ -34,6 +34,7 @@ public class RecommendationRankingService {
 			RecommendationSignals signals = signalService.signals(userId, candidate);
 			ranked.add(new RankedRecommendation(
 					candidate,
+					signals,
 					scorer.score(mode, signals),
 					explanationService.explain(mode, signals)));
 		}

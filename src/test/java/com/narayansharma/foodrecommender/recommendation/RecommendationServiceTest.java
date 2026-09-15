@@ -39,7 +39,13 @@ class RecommendationServiceTest {
 		});
 		assertThat(count("recommendation_requests")).isEqualTo(1);
 		assertThat(count("recommendation_results")).isEqualTo(1);
+		assertThat(count("recommendation_result_features")).isEqualTo(1);
 		assertThat(count("recommendation_reasons")).isEqualTo(1);
+		assertThat(jdbcTemplate.queryForObject(
+				"SELECT popularity FROM recommendation_result_features", BigDecimal.class))
+				.isEqualByComparingTo(new BigDecimal("0.625000"));
+		assertThat(jdbcTemplate.queryForObject(
+				"SELECT previously_rated FROM recommendation_result_features", Boolean.class)).isFalse();
 	}
 
 	@Test
