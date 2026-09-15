@@ -27,14 +27,19 @@ public class RecommendationCandidateService {
 	}
 
 	public List<RecommendationCandidate> safeCandidates(UUID userId, UUID restaurantId) {
+		return safeCandidateSet(userId, restaurantId).candidates();
+	}
+
+	public RecommendationCandidateSet safeCandidateSet(UUID userId, UUID restaurantId) {
 		requireActiveUser(userId);
 		UUID menuVersionId = currentMenuVersion(restaurantId);
 		Restrictions restrictions = restrictions(userId);
-		return menuItems(menuVersionId).stream()
+		List<RecommendationCandidate> candidates = menuItems(menuVersionId).stream()
 				.filter(candidate -> passesAllergies(candidate.menuItemId(), restrictions.allergies()))
 				.filter(candidate -> dietaryPolicy.allows(
 						restrictions.dietary(), allergyPolicy.reliablePresentIngredientKeys(candidate.menuItemId())))
 				.toList();
+		return new RecommendationCandidateSet(menuVersionId, candidates);
 	}
 
 	private boolean passesAllergies(UUID menuItemId, Set<String> allergies) {

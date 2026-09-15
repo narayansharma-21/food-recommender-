@@ -41,7 +41,10 @@ class RecommendationCandidateServiceTest {
 				) VALUES (?, ?, 'DIETARY', 'kosher', 'Kosher', TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 				""", UUID.randomUUID(), userId);
 
-		assertThat(candidateService.safeCandidates(userId, fixture.restaurantId())).isEmpty();
+		RecommendationCandidateSet candidates = candidateService.safeCandidateSet(userId, fixture.restaurantId());
+
+		assertThat(candidates.menuVersionId()).isEqualTo(fixture.currentVersionId());
+		assertThat(candidates.candidates()).isEmpty();
 	}
 
 	private UUID insertUser() {
