@@ -6,6 +6,7 @@ import java.util.UUID;
 
 public record RecommendationResponse(
 		String algorithmVersion,
+		String featureVersion,
 		UUID menuVersionId,
 		RecommendationMode mode,
 		Instant generatedAt,
