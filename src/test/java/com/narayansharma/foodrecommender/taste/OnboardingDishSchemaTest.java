@@ -39,6 +39,12 @@ class OnboardingDishSchemaTest {
 				JOIN dish_concept_ingredients mapping ON mapping.dish_concept_id = onboarding.dish_concept_id
 				WHERE onboarding.launch_city = 'Greater Boston'
 				""", Integer.class)).isEqualTo(12);
+		assertThat(jdbcTemplate.queryForObject("""
+				SELECT COUNT(*)
+				FROM onboarding_dishes onboarding
+				JOIN dish_concept_preparations mapping ON mapping.dish_concept_id = onboarding.dish_concept_id
+				WHERE onboarding.launch_city = 'Greater Boston'
+				""", Integer.class)).isEqualTo(12);
 	}
 
 	@Test
@@ -68,7 +74,7 @@ class OnboardingDishSchemaTest {
 		assertThat(jdbcTemplate.queryForObject(
 				"SELECT COUNT(*) FROM taste_profile_features WHERE user_id = ?",
 				Integer.class,
-				userId)).isEqualTo(2);
+				userId)).isEqualTo(3);
 	}
 
 	private UUID insertUser() {
