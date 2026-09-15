@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.narayansharma.foodrecommender.platform.web.ApiException;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -46,6 +47,15 @@ class RatingServiceTest {
 		assertThat(count("rating_tags", "rating_id", ratingId)).isEqualTo(2);
 		assertThat(count("rating_revisions", "rating_id", ratingId)).isEqualTo(1);
 		assertThat(count("feedback_change_events", "rating_id", ratingId)).isEqualTo(1);
+		assertThat(jdbcTemplate.queryForObject("""
+				SELECT COUNT(*) FROM feedback_change_events
+				WHERE rating_id = ? AND processed_at IS NOT NULL
+				""", Integer.class, ratingId)).isEqualTo(1);
+		assertThat(jdbcTemplate.queryForObject("""
+				SELECT preference_score FROM taste_profile_features
+				WHERE user_id = ? AND feature_type = 'CUISINE' AND feature_key = 'american'
+				""", BigDecimal.class, userId))
+				.isEqualByComparingTo(new BigDecimal("0.333333"));
 		assertThat(jdbcTemplate.queryForList("""
 				SELECT signal.trait_key
 				FROM rating_trait_signals signal
@@ -196,6 +206,10 @@ class RatingServiceTest {
 				    id, concept_key, display_name, normalized_name, created_at, updated_at
 				) VALUES (?, ?, 'Test Pizza', 'test pizza', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 				""", dishId, "test_pizza_" + dishId.toString().replace("-", ""));
+		jdbcTemplate.update("""
+				INSERT INTO dish_concept_cuisines (dish_concept_id, cuisine_id)
+				VALUES (?, '30000000-0000-0000-0000-000000000002')
+				""", dishId);
 		jdbcTemplate.update("""
 				INSERT INTO menu_items (id, menu_section_id, dish_concept_id, display_name, display_order)
 				VALUES (?, ?, ?, 'Test Pizza', 0)
