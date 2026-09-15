@@ -40,6 +40,14 @@ public class AllergyEvidencePolicy {
 				: AllergyEvidenceAssessment.UNKNOWN;
 	}
 
+	public Set<String> reliablePresentIngredientKeys(UUID menuItemId) {
+		requireMenuItem(menuItemId);
+		return reliableAssertions(menuItemId).entrySet().stream()
+				.filter(entry -> entry.getValue().decision() == AssertionDecision.PRESENT)
+				.map(Map.Entry::getKey)
+				.collect(java.util.stream.Collectors.toUnmodifiableSet());
+	}
+
 	private void requireMenuItem(UUID menuItemId) {
 		Integer count = jdbcTemplate.queryForObject(
 				"SELECT COUNT(*) FROM menu_items WHERE id = ?",

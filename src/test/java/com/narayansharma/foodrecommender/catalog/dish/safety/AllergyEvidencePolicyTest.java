@@ -62,6 +62,9 @@ class AllergyEvidencePolicyTest {
 				.isEqualTo(AllergyEvidenceAssessment.UNKNOWN);
 		assertThat(policy.assess(menuItemId, Set.of("clam", "pork")))
 				.isEqualTo(AllergyEvidenceAssessment.UNKNOWN);
+		assertThat(policy.reliablePresentIngredientKeys(menuItemId))
+				.contains("lobster")
+				.doesNotContain("clam", "shrimp");
 	}
 
 	private void insertDeclaredAbsence(UUID extractionId, UUID menuItemId, String ingredientId) {
