@@ -13,12 +13,12 @@ public class RecommendationExplanationService {
 		List<RecommendationExplanation> explanations = new ArrayList<>();
 		if (signals.personalPreference().compareTo(new BigDecimal("0.050000")) > 0) {
 			explanations.add(new RecommendationExplanation(
-					"TASTE_MATCH", "Matches preferences supported by your ratings."));
+					"TASTE_MATCH", "Matches preferences in your taste profile."));
 		}
 		if (signals.popularityRatingCount() > 0
 				&& signals.popularity().compareTo(new BigDecimal("0.600000")) >= 0) {
 			explanations.add(new RecommendationExplanation(
-					"POPULAR_CHOICE", "Backed by the restaurant's available rating history."));
+					"POPULAR_CHOICE", "Backed by available community ratings."));
 		}
 		if (mode == RecommendationMode.TRY_SOMETHING_NEW && !signals.previouslyRated()) {
 			explanations.add(new RecommendationExplanation(

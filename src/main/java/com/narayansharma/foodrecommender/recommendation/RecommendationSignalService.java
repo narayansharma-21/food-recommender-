@@ -19,8 +19,8 @@ public class RecommendationSignalService {
 
 	public RecommendationSignals signals(UUID userId, RecommendationCandidate candidate) {
 		List<Preference> preferences = preferences(userId, candidate.dishConceptId());
-		int evidenceCount = preferences.stream().mapToInt(Preference::evidenceCount).sum();
-		BigDecimal personal = weightedPreference(preferences, evidenceCount);
+		int evidenceCount = distinctEvidenceCount(preferences);
+		BigDecimal personal = weightedPreference(preferences);
 		Popularity popularity = popularity(candidate);
 		return new RecommendationSignals(
 				personal,
@@ -35,7 +35,7 @@ public class RecommendationSignalService {
 			return List.of();
 		}
 		return jdbcTemplate.query("""
-				SELECT feature.preference_score, feature.evidence_count
+				SELECT feature.id, feature.preference_score, feature.evidence_count
 				FROM taste_profile_features feature
 				WHERE feature.user_id = ? AND (
 				    (feature.feature_type = 'CUISINE' AND EXISTS (
@@ -60,19 +60,36 @@ public class RecommendationSignalService {
 				    ))
 				)
 				""", (resultSet, rowNumber) -> new Preference(
+				resultSet.getObject("id", UUID.class),
 				resultSet.getBigDecimal("preference_score"),
 				resultSet.getInt("evidence_count")),
 				userId, dishConceptId, dishConceptId, dishConceptId, dishConceptId);
 	}
 
-	private BigDecimal weightedPreference(List<Preference> preferences, int evidenceCount) {
-		if (evidenceCount == 0) {
+	private BigDecimal weightedPreference(List<Preference> preferences) {
+		int featureWeight = preferences.stream().mapToInt(Preference::evidenceCount).sum();
+		if (featureWeight == 0) {
 			return BigDecimal.ZERO.setScale(6);
 		}
 		BigDecimal total = preferences.stream()
 				.map(preference -> preference.score().multiply(BigDecimal.valueOf(preference.evidenceCount())))
 				.reduce(BigDecimal.ZERO, BigDecimal::add);
-		return total.divide(BigDecimal.valueOf(evidenceCount), 6, RoundingMode.HALF_UP);
+		return total.divide(BigDecimal.valueOf(featureWeight), 6, RoundingMode.HALF_UP);
+	}
+
+	private int distinctEvidenceCount(List<Preference> preferences) {
+		if (preferences.isEmpty()) {
+			return 0;
+		}
+		String placeholders = String.join(",", java.util.Collections.nCopies(preferences.size(), "?"));
+		List<EvidenceSource> sources = jdbcTemplate.query(
+				"SELECT DISTINCT source_type, source_id FROM taste_profile_evidence "
+						+ "WHERE feature_id IN (" + placeholders + ")",
+				(resultSet, rowNumber) -> new EvidenceSource(
+						resultSet.getString("source_type"),
+						resultSet.getObject("source_id", UUID.class)),
+				preferences.stream().map(Preference::featureId).toArray());
+		return sources.size();
 	}
 
 	private Popularity popularity(RecommendationCandidate candidate) {
@@ -106,7 +123,10 @@ public class RecommendationSignalService {
 		return count != null && count > 0;
 	}
 
-	private record Preference(BigDecimal score, int evidenceCount) {
+	private record Preference(UUID featureId, BigDecimal score, int evidenceCount) {
+	}
+
+	private record EvidenceSource(String type, UUID id) {
 	}
 
 	private record Popularity(int ratingCount, BigDecimal ratingSum) {

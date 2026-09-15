@@ -16,6 +16,12 @@ class RecommendationExplanationServiceTest {
 		assertThat(service.explain(RecommendationMode.TRY_SOMETHING_NEW, signals))
 				.extracting(RecommendationExplanation::code)
 				.containsExactly("TASTE_MATCH", "POPULAR_CHOICE", "NEW_FOR_YOU");
+		assertThat(service.explain(RecommendationMode.TRY_SOMETHING_NEW, signals))
+				.extracting(RecommendationExplanation::text)
+				.containsExactly(
+						"Matches preferences in your taste profile.",
+						"Backed by available community ratings.",
+						"You have not rated this dish before.");
 	}
 
 	@Test
