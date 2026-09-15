@@ -68,7 +68,7 @@ class OnboardingDishSchemaTest {
 		assertThat(jdbcTemplate.queryForObject(
 				"SELECT COUNT(*) FROM taste_profile_features WHERE user_id = ?",
 				Integer.class,
-				userId)).isEqualTo(1);
+				userId)).isEqualTo(2);
 	}
 
 	private UUID insertUser() {

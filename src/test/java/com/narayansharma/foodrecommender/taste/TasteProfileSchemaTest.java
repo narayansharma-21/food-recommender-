@@ -77,11 +77,14 @@ class TasteProfileSchemaTest {
 				SELECT COUNT(*)
 				FROM taste_profile_evidence evidence
 				JOIN taste_profile_features feature ON feature.id = evidence.feature_id
-				WHERE feature.user_id = ? AND evidence.source_type = 'ONBOARDING_RESPONSE'
+				WHERE feature.user_id = ? AND feature.feature_type = 'CUISINE'
+				  AND evidence.source_type = 'ONBOARDING_RESPONSE'
 				""", Integer.class, userId)).isEqualTo(1);
 		TasteProfileView profile = queryService.get(userId);
 		assertThat(profile.calculationVersion()).isEqualTo("weighted-v1");
-		assertThat(profile.features()).singleElement()
+		assertThat(profile.features())
+				.filteredOn(feature -> feature.key().equals("new_england"))
+				.singleElement()
 				.satisfies(feature -> assertThat(feature.evidence()).hasSize(1));
 	}
 }
