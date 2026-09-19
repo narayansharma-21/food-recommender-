@@ -27,3 +27,6 @@ jobs:
 
       - name: Compile, check formatting, run migrations, and test
         run: ./gradlew --no-daemon --no-watch-fs clean check
+
+      - name: Test ML evaluation jobs
+        run: python3 -m unittest discover -s ml/tests -v
