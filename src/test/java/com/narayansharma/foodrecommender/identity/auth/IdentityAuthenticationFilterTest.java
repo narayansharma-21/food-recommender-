@@ -60,11 +60,11 @@ class IdentityAuthenticationFilterTest {
 
 	@Test
 	void allowsOnlyConfiguredIdentitiesIntoAdminRoutes() throws Exception {
-		mockMvc.perform(get("/v1/admin/test")
+		mockMvc.perform(get("/v1/admin/jobs/failed")
 				.header("Authorization", "Bearer valid-token"))
 				.andExpect(status().isOk());
 
-		mockMvc.perform(get("/v1/admin/test")
+		mockMvc.perform(get("/v1/admin/jobs/failed")
 				.header("Authorization", "Bearer normal-token"))
 				.andExpect(status().isForbidden());
 	}
@@ -178,11 +178,6 @@ class IdentityAuthenticationFilterTest {
 		@GetMapping("/v1/test-auth")
 		UserPrincipal get(@AuthenticationPrincipal UserPrincipal principal) {
 			return principal;
-		}
-
-		@GetMapping("/v1/admin/test")
-		String admin() {
-			return "ok";
 		}
 	}
 }
