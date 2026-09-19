@@ -16,7 +16,8 @@ class SecurityConfiguration {
 			HttpSecurity http,
 			ApiAuthenticationEntryPoint authenticationEntryPoint,
 			ObjectProvider<IdentityTokenVerifier> tokenVerifierProvider,
-			UserProvisioningService provisioningService) throws Exception {
+			UserProvisioningService provisioningService,
+			AdminIdentityPolicy adminIdentityPolicy) throws Exception {
 		http
 				.csrf(csrf -> csrf.disable())
 				.httpBasic(httpBasic -> httpBasic.disable())
@@ -27,6 +28,7 @@ class SecurityConfiguration {
 				.authorizeHttpRequests(authorize -> authorize
 						.requestMatchers("/actuator/health/**", "/actuator/info").permitAll()
 						.requestMatchers("/actuator/**").denyAll()
+						.requestMatchers("/v1/admin/**").hasRole("ADMIN")
 						.requestMatchers("/v1/**").authenticated()
 						.anyRequest().permitAll());
 		IdentityTokenVerifier tokenVerifier = tokenVerifierProvider.getIfAvailable();
@@ -35,7 +37,8 @@ class SecurityConfiguration {
 					new IdentityAuthenticationFilter(
 							tokenVerifier,
 							provisioningService,
-							authenticationEntryPoint),
+							authenticationEntryPoint,
+							adminIdentityPolicy),
 					UsernamePasswordAuthenticationFilter.class);
 		}
 		return http.build();

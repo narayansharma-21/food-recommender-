@@ -36,6 +36,10 @@ identity:
     enabled: ${FIREBASE_AUTH_ENABLED:false}
     project-id: ${FIREBASE_PROJECT_ID:}
 
+security:
+  admin:
+    identities: ${ADMIN_IDENTITIES:}
+
 platform:
   storage:
     provider: ${OBJECT_STORAGE_PROVIDER:filesystem}

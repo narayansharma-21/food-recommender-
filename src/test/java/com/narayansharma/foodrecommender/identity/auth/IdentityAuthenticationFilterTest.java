@@ -20,7 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@SpringBootTest
+@SpringBootTest(properties = "security.admin.identities=firebase:filter-test-user")
 @AutoConfigureMockMvc
 @Import(IdentityAuthenticationFilterTest.TestAuthConfiguration.class)
 class IdentityAuthenticationFilterTest {
@@ -56,6 +56,17 @@ class IdentityAuthenticationFilterTest {
 		mockMvc.perform(get("/actuator/health/liveness")
 				.header("Authorization", "Bearer invalid-token"))
 				.andExpect(status().isOk());
+	}
+
+	@Test
+	void allowsOnlyConfiguredIdentitiesIntoAdminRoutes() throws Exception {
+		mockMvc.perform(get("/v1/admin/test")
+				.header("Authorization", "Bearer valid-token"))
+				.andExpect(status().isOk());
+
+		mockMvc.perform(get("/v1/admin/test")
+				.header("Authorization", "Bearer normal-token"))
+				.andExpect(status().isForbidden());
 	}
 
 	@Test
@@ -146,6 +157,9 @@ class IdentityAuthenticationFilterTest {
 		@Bean
 		IdentityTokenVerifier testIdentityTokenVerifier() {
 			return token -> {
+				if ("normal-token".equals(token)) {
+					return new VerifiedIdentity("firebase", "normal-test-user");
+				}
 				if (!"valid-token".equals(token)) {
 					throw new InvalidIdentityTokenException("Invalid test token");
 				}
@@ -164,6 +178,11 @@ class IdentityAuthenticationFilterTest {
 		@GetMapping("/v1/test-auth")
 		UserPrincipal get(@AuthenticationPrincipal UserPrincipal principal) {
 			return principal;
+		}
+
+		@GetMapping("/v1/admin/test")
+		String admin() {
+			return "ok";
 		}
 	}
 }

@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.List;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -19,14 +20,17 @@ public class IdentityAuthenticationFilter extends OncePerRequestFilter {
 	private final IdentityTokenVerifier tokenVerifier;
 	private final UserProvisioningService provisioningService;
 	private final ApiAuthenticationEntryPoint authenticationEntryPoint;
+	private final AdminIdentityPolicy adminIdentityPolicy;
 
 	public IdentityAuthenticationFilter(
 			IdentityTokenVerifier tokenVerifier,
 			UserProvisioningService provisioningService,
-			ApiAuthenticationEntryPoint authenticationEntryPoint) {
+			ApiAuthenticationEntryPoint authenticationEntryPoint,
+			AdminIdentityPolicy adminIdentityPolicy) {
 		this.tokenVerifier = tokenVerifier;
 		this.provisioningService = provisioningService;
 		this.authenticationEntryPoint = authenticationEntryPoint;
+		this.adminIdentityPolicy = adminIdentityPolicy;
 	}
 
 	@Override
@@ -50,8 +54,12 @@ public class IdentityAuthenticationFilter extends OncePerRequestFilter {
 			InternalUser user = provisioningService.findOrCreate(identity);
 			UserPrincipal principal = new UserPrincipal(
 					user.id(), identity.provider(), identity.subject());
+			List<SimpleGrantedAuthority> authorities = adminIdentityPolicy.isAdmin(
+					identity.provider(), identity.subject())
+					? List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))
+					: List.of();
 			SecurityContextHolder.getContext().setAuthentication(
-					UsernamePasswordAuthenticationToken.authenticated(principal, null, List.of()));
+					UsernamePasswordAuthenticationToken.authenticated(principal, null, authorities));
 			filterChain.doFilter(request, response);
 		} catch (InvalidIdentityTokenException | IllegalStateException exception) {
 			SecurityContextHolder.clearContext();
