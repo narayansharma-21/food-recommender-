@@ -113,4 +113,19 @@ POST /v1/restaurants/{restaurantId}/recommendations
 confidence, short reasons, and the menu, ranking, and taste-feature versions used. Each response is saved
 as an impression for later evaluation.
 
+## ML improvement foundation
+
+Recommendation impressions now keep the exact feature values used at ranking time. The Java backend can
+export versioned JSONL training datasets with content hashes and code versions. `ml/baseline.py` evaluates
+a free, dependency-free global-mean baseline across overall, new-user, new-dish, and sparse-profile cases:
+
+```bash
+python3 ml/baseline.py dataset.jsonl --output baseline-metrics.json
+python3 -m unittest discover -s ml/tests -v
+```
+
+The model registry records datasets, artifacts, metrics, and promotion history. A candidate must beat its
+stored baseline MAE before promotion, and a prior model can be promoted again for rollback. No learned
+model is active yet; weighted rules remain the production recommender until enough first-party data exists.
+
 See [the backend design plan](docs/BACKEND_DESIGN_PLAN.md) for scope, task IDs, and delivery phases.

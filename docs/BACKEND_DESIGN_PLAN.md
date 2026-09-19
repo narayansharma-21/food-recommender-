@@ -314,6 +314,10 @@ Proof-of-concept delivery:
 
 ### 4.10 ML Training and Evaluation
 
+Status: Data-contract, reproducible-export, baseline-evaluation, model-registry, and guarded-promotion
+foundations are complete. Learned-model training, calibration, inference, and drift monitoring remain
+deferred until enough first-party ratings exist.
+
 Owns datasets, model training, evaluation, and versioned model artifacts.
 
 Tasks:
@@ -336,6 +340,17 @@ Done when:
 - The backend can roll back to the previous model.
 
 Do not block V1 on a trained ML model. The weighted scoring model is the initial production model.
+
+Proof-of-concept delivery:
+
+- Recommendation impressions store point-in-time features so later ratings cannot leak into training data.
+- Ratings are attributed only to the most recent earlier impression of the same item.
+- Java and Python share a versioned JSON training-row contract.
+- Dataset exports are deterministic JSONL artifacts with time ranges, hashes, row counts, and code versions.
+- A dependency-free Python baseline reports overall, new-user, new-dish, and sparse-profile error.
+- Registered models retain dataset, artifact, metrics, and code versions.
+- Promotion requires lower overall MAE than the baseline and keeps history for rollback.
+- Boosted-tree training and learned-model serving stay deferred until real data can prove value.
 
 ### 4.11 Administration and Data Quality
 
