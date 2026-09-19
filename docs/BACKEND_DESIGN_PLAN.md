@@ -354,6 +354,9 @@ Proof-of-concept delivery:
 
 ### 4.11 Administration and Data Quality
 
+Status: Exact-identity admin authorization, failed-job inspection and retry, and immutable retry audit
+events are complete. Menu review, duplicate merge, and freshness workflows remain deferred.
+
 Owns human review and operational correction workflows.
 
 Tasks:
@@ -371,6 +374,10 @@ Done when:
 - Every administrative change is attributable and reversible where practical.
 
 ### 4.12 Security and Reliability
+
+Status: User-ownership authorization tests, upload type and size checks, recommendation rate limiting,
+and provider failure behavior are complete for the proof of concept. Shared multi-instance rate limiting,
+malware scanning, backups, retention, and infrastructure security scanning remain launch tasks.
 
 Tasks:
 

@@ -68,6 +68,11 @@ dish:
       dimensions: ${DISH_EMBEDDING_DIMENSIONS:128}
       model-version: ${DISH_EMBEDDING_MODEL_VERSION:hashing-v1}
 
+recommendation:
+  rate-limit:
+    requests: ${RECOMMENDATION_RATE_LIMIT_REQUESTS:30}
+    window: ${RECOMMENDATION_RATE_LIMIT_WINDOW:PT1M}
+
 menu:
   extraction:
     parser-version: ${MENU_EXTRACTION_PARSER_VERSION:rules-v1}

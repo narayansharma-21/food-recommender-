@@ -85,6 +85,14 @@ Keep the service-account file outside the repository. Mobile clients sign in thr
 the resulting ID token as `Authorization: Bearer <token>`. The backend verifies the token and maps the
 Firebase user to a separate internal user ID.
 
+Admin routes require an exact configured provider identity. For the sole Firebase administrator, set:
+
+```text
+ADMIN_IDENTITIES=firebase:your-firebase-uid
+```
+
+Do not use an email address unless it is the stable verified provider subject in the authentication token.
+
 See the [official Firebase Admin setup guide](https://firebase.google.com/docs/admin/setup) for project
 and credential setup.
 
@@ -127,5 +135,7 @@ python3 -m unittest discover -s ml/tests -v
 The model registry records datasets, artifacts, metrics, and promotion history. A candidate must beat its
 stored baseline MAE before promotion, and a prior model can be promoted again for rollback. No learned
 model is active yet; weighted rules remain the production recommender until enough first-party data exists.
+
+See [operations](docs/OPERATIONS.md) for failure behavior, admin job recovery, and deferred launch controls.
 
 See [the backend design plan](docs/BACKEND_DESIGN_PLAN.md) for scope, task IDs, and delivery phases.
