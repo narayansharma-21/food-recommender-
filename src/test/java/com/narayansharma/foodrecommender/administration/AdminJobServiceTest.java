@@ -36,7 +36,11 @@ class AdminJobServiceTest {
 		UUID jobId = backgroundJobService.enqueue("MENU_EXTRACTION", "{}");
 		backgroundJobService.claimNext("test-worker").orElseThrow();
 		backgroundJobService.fail(
-				jobId, "test-worker", new IllegalStateException("OCR unavailable"), 1, Duration.ZERO);
+				jobId,
+				"test-worker",
+				new IllegalStateException("OCR unavailable " + "x".repeat(5000)),
+				1,
+				Duration.ZERO);
 		entityManager.flush();
 
 		assertThat(adminJobService.failedJobs(10))
@@ -54,7 +58,9 @@ class AdminJobServiceTest {
 				"SELECT actor_user_id, reason, details_json FROM admin_audit_events WHERE target_id = ?", jobId);
 		assertThat(audit.get("ACTOR_USER_ID")).isEqualTo(actorId);
 		assertThat(audit.get("REASON")).isEqualTo("Tesseract was restored");
-		assertThat((String) audit.get("DETAILS_JSON")).contains("OCR unavailable");
+		assertThat((String) audit.get("DETAILS_JSON"))
+				.contains("OCR unavailable")
+				.hasSizeLessThan(4000);
 	}
 
 	@Test

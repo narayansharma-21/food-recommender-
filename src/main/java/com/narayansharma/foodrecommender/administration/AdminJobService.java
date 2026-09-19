@@ -92,12 +92,18 @@ public class AdminJobService {
 		Map<String, Object> details = new LinkedHashMap<>();
 		details.put("jobType", job.jobType());
 		details.put("previousAttempts", job.attempts());
-		details.put("previousError", job.lastError());
+		details.put("previousError", truncate(job.lastError(), 500));
 		try {
 			return objectMapper.writeValueAsString(details);
 		} catch (JacksonException exception) {
 			throw new IllegalStateException("Admin audit details could not be serialized", exception);
 		}
+	}
+
+	private String truncate(String value, int maximumLength) {
+		return value == null || value.length() <= maximumLength
+				? value
+				: value.substring(0, maximumLength);
 	}
 
 	private void validateRetry(UUID jobId, UUID actorUserId, String reason) {
