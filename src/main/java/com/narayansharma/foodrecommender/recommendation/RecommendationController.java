@@ -14,9 +14,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/v1/restaurants/{restaurantId}/recommendations")
 public class RecommendationController {
 	private final RecommendationService recommendationService;
+	private final RecommendationRateLimiter rateLimiter;
 
-	public RecommendationController(RecommendationService recommendationService) {
+	public RecommendationController(
+			RecommendationService recommendationService,
+			RecommendationRateLimiter rateLimiter) {
 		this.recommendationService = recommendationService;
+		this.rateLimiter = rateLimiter;
 	}
 
 	@PostMapping
@@ -24,6 +28,7 @@ public class RecommendationController {
 			@AuthenticationPrincipal UserPrincipal principal,
 			@PathVariable UUID restaurantId,
 			@Valid @RequestBody RecommendationRequest request) {
+		rateLimiter.requireAllowed(principal.userId());
 		return recommendationService.recommend(principal.userId(), restaurantId, request);
 	}
 }
