@@ -15,6 +15,7 @@ class SecurityConfiguration {
 	SecurityFilterChain apiSecurityFilterChain(
 			HttpSecurity http,
 			ApiAuthenticationEntryPoint authenticationEntryPoint,
+			ApiAccessDeniedHandler accessDeniedHandler,
 			ObjectProvider<IdentityTokenVerifier> tokenVerifierProvider,
 			UserProvisioningService provisioningService,
 			AdminIdentityPolicy adminIdentityPolicy) throws Exception {
@@ -24,7 +25,9 @@ class SecurityConfiguration {
 				.formLogin(formLogin -> formLogin.disable())
 				.logout(logout -> logout.disable())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				.exceptionHandling(exceptions -> exceptions.authenticationEntryPoint(authenticationEntryPoint))
+				.exceptionHandling(exceptions -> exceptions
+						.authenticationEntryPoint(authenticationEntryPoint)
+						.accessDeniedHandler(accessDeniedHandler))
 				.authorizeHttpRequests(authorize -> authorize
 						.requestMatchers("/actuator/health/**", "/actuator/info").permitAll()
 						.requestMatchers("/actuator/**").denyAll()

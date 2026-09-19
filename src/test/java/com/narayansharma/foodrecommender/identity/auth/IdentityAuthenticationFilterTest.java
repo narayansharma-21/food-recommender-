@@ -66,7 +66,8 @@ class IdentityAuthenticationFilterTest {
 
 		mockMvc.perform(get("/v1/admin/jobs/failed")
 				.header("Authorization", "Bearer normal-token"))
-				.andExpect(status().isForbidden());
+				.andExpect(status().isForbidden())
+				.andExpect(jsonPath("$.code").value("AUTHORIZATION_DENIED"));
 	}
 
 	@Test
