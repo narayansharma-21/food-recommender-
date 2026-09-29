@@ -60,11 +60,15 @@ the provider ID for every result and include internal restaurant and location ID
 Authenticated clients can use:
 
 - `GET /v1/restaurants/search?q=coffee` to search Greater Boston source records.
+- `POST /v1/restaurants/resolve` with a search result's source and external ID to obtain stable internal IDs.
 - `GET /v1/restaurants/{restaurantId}` to read canonical restaurant and active-location details.
 - `GET /v1/restaurants/{restaurantId}/menus/current` to read the latest captured structured menu.
 
 The current-menu response reports `PROCESSING` until extraction finishes. "Current" means the newest
 captured version for now; freshness and verification are intentionally deferred.
+
+Restaurant selection reuses a strong existing match instead of creating a duplicate. Uncertain matches
+create a separate restaurant and enter the duplicate-review queue; they are never merged automatically.
 
 The application must display the attribution required by the datasets included in Overture. See the
 [Overture attribution guide](https://docs.overturemaps.org/attribution/) before distributing data.

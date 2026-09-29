@@ -114,8 +114,8 @@ Proof-of-concept delivery:
 
 ### 4.3 Restaurant Catalog
 
-Status: Provider search, matching foundations, canonical detail queries, and current-menu reads are complete
-for the Greater Boston proof of concept. Automatic source-to-canonical onboarding remains deferred.
+Status: Provider search, user-selected canonical onboarding, matching, canonical detail queries, and
+current-menu reads are complete for the Greater Boston proof of concept.
 
 Owns restaurant locations and source identifiers.
 
@@ -139,6 +139,8 @@ Proof-of-concept delivery:
 
 - Authenticated clients can search Greater Boston restaurant source records with opaque pagination.
 - Search results retain provider IDs and add canonical IDs only after an explicit link exists.
+- Selecting an unlinked result creates stable internal IDs, reuses strong matches, and sends ambiguous
+  matches to duplicate review instead of merging them automatically.
 - Canonical restaurant details return active locations and follow completed duplicate merges.
 - The current-menu endpoint returns the latest captured version, its source, extraction status, sections,
   items, prices, and modifiers.
