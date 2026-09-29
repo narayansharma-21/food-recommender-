@@ -70,6 +70,10 @@ captured version for now; freshness and verification are intentionally deferred.
 Restaurant selection reuses a strong existing match instead of creating a duplicate. Uncertain matches
 create a separate restaurant and enter the duplicate-review queue; they are never merged automatically.
 
+An authenticated client can upload a photographed menu with `POST /v1/menus/upload` as multipart form
+data. Send `locationId`, an optional `menuKey` and `displayName`, and a JPEG or PNG part named `file`.
+The API creates or reuses the menu, stores the validated image, and returns `202` while extraction runs.
+
 The application must display the attribution required by the datasets included in Overture. See the
 [Overture attribution guide](https://docs.overturemaps.org/attribution/) before distributing data.
 

@@ -17,6 +17,8 @@
 ## Storage failures
 
 - Menu uploads validate type and size before catalog changes are committed.
+- Uploads are limited to 10 per signed-in user per hour by default.
+- Multipart parsing rejects requests above the configured limit before application processing.
 - If object storage or the database transaction fails, the upload fails and rollback cleanup removes the
   newly stored object when possible.
 - Operators should investigate cleanup warnings because they can indicate an orphaned object.
@@ -44,6 +46,6 @@
 
 ## Deferred launch controls
 
-Database backup/restore automation, raw-image retention, malware scanning, and hosted encryption settings
-depend on the selected deployment and storage providers. They must be completed and tested before a public
-launch; they are not required to run the local proof of concept.
+Database backup/restore automation, raw-image retention, malware scanning, shared multi-instance rate
+limiting, and hosted encryption settings depend on the selected deployment and storage providers. They must
+be completed and tested before a public launch; they are not required to run the local proof of concept.

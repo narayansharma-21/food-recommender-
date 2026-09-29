@@ -148,7 +148,9 @@ Proof-of-concept delivery:
 
 ### 4.4 Menu Sources and Versioning
 
-Status: Proof-of-concept scope complete through `MENU-05`. Verification, freshness, reporting, and admin review (`MENU-06` through `MENU-09`) are deferred.
+Status: User image upload, storage, versioning, and extraction queueing are exposed through an authenticated
+API. Official URL registration exists internally; secure URL fetching remains the next source milestone.
+Verification, freshness, reporting, and admin review (`MENU-06` through `MENU-09`) are deferred.
 
 Owns menu sources, snapshots, versions, freshness, and publication state.
 
@@ -387,10 +389,9 @@ Done when:
 
 ### 4.12 Security and Reliability
 
-Status: User-ownership authorization tests, upload type and size checks, search and recommendation rate
-limiting, and provider failure behavior are complete for the proof of concept. Upload rate limiting,
-shared multi-instance rate limiting,
-malware scanning, backups, retention, and infrastructure security scanning remain launch tasks.
+Status: User-ownership authorization tests, upload type and size checks, upload, search, and recommendation
+rate limiting, and provider failure behavior are complete for the proof of concept. Shared multi-instance
+rate limiting, malware scanning, backups, retention, and infrastructure security scanning remain launch tasks.
 
 Tasks:
 
