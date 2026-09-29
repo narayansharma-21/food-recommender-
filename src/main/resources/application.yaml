@@ -12,6 +12,10 @@ spring:
     hibernate:
       ddl-auto: validate
     open-in-view: false
+  servlet:
+    multipart:
+      max-file-size: ${MENU_UPLOAD_MAX_FILE_SIZE:10MB}
+      max-request-size: ${MENU_UPLOAD_MAX_REQUEST_SIZE:11MB}
 
 management:
   endpoints:

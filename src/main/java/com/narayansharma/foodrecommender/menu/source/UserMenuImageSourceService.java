@@ -105,7 +105,7 @@ public class UserMenuImageSourceService {
 			input.unread(header);
 			return objectStorage.store(STORAGE_NAMESPACE, new SizeLimitedInputStream(input, maximumBytes));
 		} catch (MenuImageTooLargeException exception) {
-			throw new IllegalArgumentException("Uploaded menu image exceeds the size limit");
+			throw new MenuUploadTooLargeException();
 		} catch (IOException exception) {
 			throw new IllegalStateException("Uploaded menu image could not be stored", exception);
 		}

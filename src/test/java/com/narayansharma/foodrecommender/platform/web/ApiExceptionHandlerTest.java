@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -55,6 +56,13 @@ class ApiExceptionHandlerTest {
 				.andExpect(jsonPath("$.code").value("NOT_FOUND"));
 	}
 
+	@Test
+	void returnsContentTooLargeForRejectedMultipartRequests() throws Exception {
+		mockMvc.perform(post("/test/too-large"))
+				.andExpect(status().isContentTooLarge())
+				.andExpect(jsonPath("$.code").value("MENU_UPLOAD_TOO_LARGE"));
+	}
+
 	@RestController
 	@RequestMapping("/test")
 	static class TestController {
@@ -65,6 +73,11 @@ class ApiExceptionHandlerTest {
 		@PostMapping("/failure")
 		void fail() {
 			throw new IllegalStateException("sensitive detail");
+		}
+
+		@PostMapping("/too-large")
+		void tooLarge() {
+			throw new MaxUploadSizeExceededException(1);
 		}
 	}
 

@@ -49,6 +49,11 @@ public class MenuSourceController {
 					file.getContentType(),
 					content);
 			return ResponseEntity.accepted().body(response);
+		} catch (MenuUploadTooLargeException exception) {
+			throw new ApiException(
+					HttpStatus.CONTENT_TOO_LARGE,
+					"MENU_UPLOAD_TOO_LARGE",
+					exception.getMessage());
 		} catch (IllegalArgumentException exception) {
 			throw new ApiException(HttpStatus.BAD_REQUEST, "INVALID_MENU_UPLOAD", exception.getMessage());
 		} catch (IOException exception) {

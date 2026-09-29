@@ -139,7 +139,7 @@ class UserMenuImageSourceServiceTest {
 
 		assertThatThrownBy(() -> service.upload(
 				MENU_ID, "user-123", "image/png", new ByteArrayInputStream(oversized)))
-				.isInstanceOf(IllegalArgumentException.class)
+				.isInstanceOf(MenuUploadTooLargeException.class)
 				.hasMessageContaining("size limit");
 		assertThat(objectStorage.objects).isEmpty();
 	}

@@ -16,6 +16,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 @RestControllerAdvice
 public class ApiExceptionHandler {
@@ -85,6 +86,18 @@ public class ApiExceptionHandler {
 				HttpStatus.BAD_REQUEST,
 				"VALIDATION_FAILED",
 				"The request contains an invalid value.",
+				request,
+				List.of());
+	}
+
+	@ExceptionHandler(MaxUploadSizeExceededException.class)
+	ResponseEntity<ApiErrorResponse> handleMaximumUploadSize(
+			MaxUploadSizeExceededException exception,
+			HttpServletRequest request) {
+		return response(
+				HttpStatus.CONTENT_TOO_LARGE,
+				"MENU_UPLOAD_TOO_LARGE",
+				"The menu upload exceeds the size limit.",
 				request,
 				List.of());
 	}
