@@ -7,6 +7,7 @@ import com.narayansharma.foodrecommender.catalog.discovery.RestaurantSearchSourc
 import com.narayansharma.foodrecommender.catalog.identifiers.ResolvedRestaurantLocation;
 import com.narayansharma.foodrecommender.catalog.identifiers.RestaurantExternalIdService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class RestaurantSearchService {
@@ -20,6 +21,7 @@ public class RestaurantSearchService {
 		this.externalIdService = externalIdService;
 	}
 
+	@Transactional(readOnly = true)
 	public RestaurantSearchResponse search(RestaurantSearchQuery query) {
 		RestaurantSearchPage page = searchSource.search(query);
 		return new RestaurantSearchResponse(

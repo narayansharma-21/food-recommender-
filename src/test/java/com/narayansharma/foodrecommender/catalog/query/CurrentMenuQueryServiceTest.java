@@ -65,7 +65,7 @@ class CurrentMenuQueryServiceTest {
 		CurrentMenuView menu = service.get(RESTAURANT_ID);
 
 		assertThat(menu.menuVersionId()).isEqualTo(VERSION_ID);
-		assertThat(menu.processingStatus()).isEqualTo("PROCESSING");
+		assertThat(menu.extractionStatus()).isEqualTo("PROCESSING");
 		assertThat(menu.sections()).isEmpty();
 	}
 
@@ -97,7 +97,7 @@ class CurrentMenuQueryServiceTest {
 
 		CurrentMenuView menu = service.get(RESTAURANT_ID);
 
-		assertThat(menu.processingStatus()).isEqualTo("READY");
+		assertThat(menu.extractionStatus()).isEqualTo("READY");
 		assertThat(menu.sourceUrl()).hasToString("https://example.com/menu");
 		assertThat(menu.sections()).singleElement().satisfies(section ->
 				assertThat(section.items()).singleElement().satisfies(item -> {

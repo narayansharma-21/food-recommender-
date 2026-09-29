@@ -12,7 +12,7 @@ public record CurrentMenuView(
 		String displayName,
 		int versionNumber,
 		Instant capturedAt,
-		String processingStatus,
+		String extractionStatus,
 		String sourceType,
 		URI sourceUrl,
 		List<MenuSectionView> sections) {
