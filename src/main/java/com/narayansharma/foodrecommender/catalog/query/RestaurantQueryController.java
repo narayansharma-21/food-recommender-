@@ -7,9 +7,11 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,9 +21,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/v1/restaurants")
 public class RestaurantQueryController {
 	private final RestaurantSearchService searchService;
+	private final RestaurantQueryService queryService;
 
-	public RestaurantQueryController(RestaurantSearchService searchService) {
+	public RestaurantQueryController(
+			RestaurantSearchService searchService,
+			RestaurantQueryService queryService) {
 		this.searchService = searchService;
+		this.queryService = queryService;
+	}
+
+	@GetMapping("/{restaurantId}")
+	public RestaurantView get(@PathVariable UUID restaurantId) {
+		return queryService.get(restaurantId);
 	}
 
 	@GetMapping("/search")
