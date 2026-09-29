@@ -89,6 +89,15 @@ class MenuSourceControllerTest {
 				.andExpect(jsonPath("$.code").value("AUTHENTICATION_REQUIRED"));
 	}
 
+	@Test
+	void reportsAMissingFileAsAValidationError() throws Exception {
+		mockMvc.perform(multipart("/v1/menus/upload")
+				.param("locationId", LOCATION_ID.toString())
+				.header("Authorization", "Bearer menu-token"))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.code").value("VALIDATION_FAILED"));
+	}
+
 	@TestConfiguration(proxyBeanMethods = false)
 	static class AuthStorageConfiguration {
 		@Bean
