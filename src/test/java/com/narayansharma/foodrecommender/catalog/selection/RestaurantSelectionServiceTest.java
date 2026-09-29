@@ -76,6 +76,32 @@ class RestaurantSelectionServiceTest {
 		assertThat(count("SELECT COUNT(*) FROM restaurants")).isZero();
 	}
 
+	@Test
+	void queuesAnAmbiguousMatchForDuplicateReview() {
+		UUID restaurantId = UUID.fromString("31000000-0000-0000-0000-000000000002");
+		UUID locationId = UUID.fromString("32000000-0000-0000-0000-000000000002");
+		jdbcTemplate.update("""
+				INSERT INTO restaurants (id, display_name, normalized_name, created_at, updated_at)
+				VALUES (?, 'Cafe Example', 'cafe example', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+				""", restaurantId);
+		jdbcTemplate.update("""
+				INSERT INTO restaurant_locations (
+				    id, restaurant_id, address_line_1, city, region, postal_code,
+				    country_code, latitude, longitude, timezone, created_at, updated_at
+				) VALUES (?, ?, '99 Side St', 'Boston', 'MA', '99999', 'US',
+				          42.361100, -71.058900, 'America/New_York', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+				""", locationId, restaurantId);
+		insertSource(SOURCE_ID, "Cafe Example", "1 Main St", "Boston", "42.360100", "-71.058900");
+
+		SelectedRestaurant selected = service.select(SOURCE_ID);
+
+		assertThat(selected.created()).isTrue();
+		assertThat(selected.matchLevel()).isEqualTo(RestaurantMatchLevel.REVIEW);
+		assertThat(selected.duplicateReviewRequired()).isTrue();
+		assertThat(count("SELECT COUNT(*) FROM restaurant_duplicate_reviews WHERE status = 'PENDING'"))
+				.isOne();
+	}
+
 	private void insertSource(
 			ExternalRestaurantId externalId,
 			String name,
