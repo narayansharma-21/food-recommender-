@@ -385,8 +385,9 @@ Done when:
 
 ### 4.12 Security and Reliability
 
-Status: User-ownership authorization tests, upload type and size checks, recommendation rate limiting,
-and provider failure behavior are complete for the proof of concept. Shared multi-instance rate limiting,
+Status: User-ownership authorization tests, upload type and size checks, search and recommendation rate
+limiting, and provider failure behavior are complete for the proof of concept. Upload rate limiting,
+shared multi-instance rate limiting,
 malware scanning, backups, retention, and infrastructure security scanning remain launch tasks.
 
 Tasks:

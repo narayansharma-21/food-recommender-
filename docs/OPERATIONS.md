@@ -29,6 +29,13 @@
 - Recommendation requests are limited to 30 per signed-in user per minute by default.
 - The current limiter is process-local. Move it to shared storage before running multiple API instances.
 
+## Restaurant search
+
+- Restaurant searches are limited to 60 per signed-in user per minute by default.
+- Search returns provider records even when no canonical restaurant is linked yet. In that case, internal
+  restaurant and location IDs are `null`.
+- The search limiter is also process-local and must move to shared storage before multi-instance deployment.
+
 ## Authentication and authorization
 
 - Invalid or missing tokens return `401 AUTHENTICATION_REQUIRED`.
