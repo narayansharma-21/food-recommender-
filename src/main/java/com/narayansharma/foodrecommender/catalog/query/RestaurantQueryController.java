@@ -59,7 +59,10 @@ public class RestaurantQueryController {
 	}
 
 	@PostMapping("/resolve")
-	public SelectedRestaurant select(@Valid @RequestBody SelectRestaurantRequest request) {
+	public SelectedRestaurant select(
+			@AuthenticationPrincipal UserPrincipal principal,
+			@Valid @RequestBody SelectRestaurantRequest request) {
+		searchRateLimiter.requireAllowed(principal.userId());
 		return selectionService.select(new ExternalRestaurantId(request.source(), request.externalId()));
 	}
 

@@ -18,6 +18,7 @@ import java.sql.Timestamp;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -236,9 +237,9 @@ public class RestaurantSelectionService {
 					addressLine1,
 					addressLine2,
 					city,
-					region == null ? defaultRegion : region,
+					normalizeRegion(region, defaultRegion),
 					postalCode,
-					countryCode == null ? defaultCountryCode : countryCode);
+					countryCode == null ? defaultCountryCode : countryCode.toUpperCase(Locale.ROOT));
 			RestaurantCoordinates coordinates = latitude == null || longitude == null
 					? null
 					: new RestaurantCoordinates(latitude, longitude);
@@ -262,6 +263,14 @@ public class RestaurantSelectionService {
 			} catch (IllegalArgumentException exception) {
 				return null;
 			}
+		}
+
+		private String normalizeRegion(String value, String defaultValue) {
+			if (value == null || ("MA".equalsIgnoreCase(defaultValue)
+					&& "Massachusetts".equalsIgnoreCase(value))) {
+				return defaultValue;
+			}
+			return value;
 		}
 	}
 

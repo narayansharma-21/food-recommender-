@@ -102,6 +102,27 @@ class RestaurantSelectionServiceTest {
 				.isOne();
 	}
 
+	@Test
+	void normalizesLaunchRegionAndCountryCodes() {
+		insertSource(SOURCE_ID, "Cafe Example", "1 Main St", "Boston", "42.360100", "-71.058900");
+		jdbcTemplate.update("""
+				UPDATE restaurant_source_records
+				SET region = 'Massachusetts', country_code = 'us'
+				WHERE source = ? AND external_id = ?
+				""", SOURCE_ID.source(), SOURCE_ID.value());
+
+		SelectedRestaurant selected = service.select(SOURCE_ID);
+
+		assertThat(jdbcTemplate.queryForObject(
+				"SELECT region FROM restaurant_locations WHERE id = ?",
+				String.class,
+				selected.locationId())).isEqualTo("MA");
+		assertThat(jdbcTemplate.queryForObject(
+				"SELECT country_code FROM restaurant_locations WHERE id = ?",
+				String.class,
+				selected.locationId())).isEqualTo("US");
+	}
+
 	private void insertSource(
 			ExternalRestaurantId externalId,
 			String name,
