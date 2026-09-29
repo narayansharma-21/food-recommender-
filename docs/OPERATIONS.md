@@ -13,6 +13,7 @@
 - The configured administrator can list failures at `GET /v1/admin/jobs/failed`.
 - `POST /v1/admin/jobs/{jobId}/retry` resets a failed job and writes an immutable audit event.
 - OCR failure does not replace or publish a partial menu extraction.
+- Client menu status reports failure without exposing internal provider or worker errors.
 
 ## Storage failures
 

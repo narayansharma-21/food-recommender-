@@ -152,6 +152,13 @@ Status: User image upload, storage, versioning, and extraction queueing are expo
 API. Official URL registration exists internally; secure URL fetching remains the next source milestone.
 Verification, freshness, reporting, and admin review (`MENU-06` through `MENU-09`) are deferred.
 
+Image upload delivery:
+
+- Upload responses return a stable menu and version ID without exposing object-storage keys.
+- Extraction jobs are linked to their menu versions for reliable client status polling.
+- Status progresses through awaiting source, queued, processing, ready, or failed without exposing internal
+  failure details.
+
 Owns menu sources, snapshots, versions, freshness, and publication state.
 
 Tasks:
