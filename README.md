@@ -54,7 +54,17 @@ uvx --from overturemaps==1.0.2 overturemaps download \
 ```
 
 Set `OVERTURE_IMPORT_ON_STARTUP=true` for one application start to import the snapshot. Imported source
-records remain separate from canonical restaurants until matching is implemented.
+records remain separate from canonical restaurants until they are explicitly linked. Search results expose
+the provider ID for every result and include internal restaurant and location IDs only after that link exists.
+
+Authenticated clients can use:
+
+- `GET /v1/restaurants/search?q=coffee` to search Greater Boston source records.
+- `GET /v1/restaurants/{restaurantId}` to read canonical restaurant and active-location details.
+- `GET /v1/restaurants/{restaurantId}/menus/current` to read the latest captured structured menu.
+
+The current-menu response reports `PROCESSING` until extraction finishes. "Current" means the newest
+captured version for now; freshness and verification are intentionally deferred.
 
 The application must display the attribution required by the datasets included in Overture. See the
 [Overture attribution guide](https://docs.overturemaps.org/attribution/) before distributing data.

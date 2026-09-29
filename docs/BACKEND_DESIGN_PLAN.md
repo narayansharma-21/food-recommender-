@@ -114,7 +114,8 @@ Proof-of-concept delivery:
 
 ### 4.3 Restaurant Catalog
 
-Status: Complete for the Greater Boston proof of concept.
+Status: Provider search, matching foundations, canonical detail queries, and current-menu reads are complete
+for the Greater Boston proof of concept. Automatic source-to-canonical onboarding remains deferred.
 
 Owns restaurant locations and source identifiers.
 
@@ -133,6 +134,15 @@ Done when:
 - Users can search supported restaurants in the launch city.
 - Duplicate locations can be detected and resolved.
 - A restaurant can exist before its menu is available.
+
+Proof-of-concept delivery:
+
+- Authenticated clients can search Greater Boston restaurant source records with opaque pagination.
+- Search results retain provider IDs and add canonical IDs only after an explicit link exists.
+- Canonical restaurant details return active locations and follow completed duplicate merges.
+- The current-menu endpoint returns the latest captured version, its source, extraction status, sections,
+  items, prices, and modifiers.
+- "Current" does not claim freshness or verification; those remain later features.
 
 ### 4.4 Menu Sources and Versioning
 
