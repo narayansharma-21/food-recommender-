@@ -170,6 +170,27 @@ class IdentityAuthenticationFilterTest {
 	}
 
 	@Test
+	void validatesAndProtectsRestaurantSelection() throws Exception {
+		mockMvc.perform(post("/v1/restaurants/resolve")
+				.header("Authorization", "Bearer valid-token")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("""
+						{"source":"INVALID SOURCE","externalId":"place-1"}
+						"""))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.code").value("VALIDATION_FAILED"));
+
+		mockMvc.perform(post("/v1/restaurants/resolve")
+				.header("Authorization", "Bearer valid-token")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("""
+						{"source":"overture","externalId":"missing-place"}
+						"""))
+				.andExpect(status().isNotFound())
+				.andExpect(jsonPath("$.code").value("RESTAURANT_SOURCE_NOT_FOUND"));
+	}
+
+	@Test
 	void reportsAnUnknownRatedMenuItem() throws Exception {
 		mockMvc.perform(post("/v1/ratings")
 				.header("Authorization", "Bearer valid-token")
