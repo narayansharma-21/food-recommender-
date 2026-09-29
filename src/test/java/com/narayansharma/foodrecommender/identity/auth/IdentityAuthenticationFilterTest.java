@@ -142,6 +142,34 @@ class IdentityAuthenticationFilterTest {
 	}
 
 	@Test
+	void exposesAuthenticatedCatalogQueries() throws Exception {
+		mockMvc.perform(get("/v1/restaurants/search")
+				.header("Authorization", "Bearer valid-token")
+				.param("q", "coffee"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.restaurants").isArray());
+
+		mockMvc.perform(get("/v1/restaurants/00000000-0000-0000-0000-000000000001")
+				.header("Authorization", "Bearer valid-token"))
+				.andExpect(status().isNotFound())
+				.andExpect(jsonPath("$.code").value("RESTAURANT_NOT_FOUND"));
+
+		mockMvc.perform(get("/v1/restaurants/00000000-0000-0000-0000-000000000001/menus/current")
+				.header("Authorization", "Bearer valid-token"))
+				.andExpect(status().isNotFound())
+				.andExpect(jsonPath("$.code").value("MENU_NOT_FOUND"));
+	}
+
+	@Test
+	void rejectsAnInvalidRestaurantSearch() throws Exception {
+		mockMvc.perform(get("/v1/restaurants/search")
+				.header("Authorization", "Bearer valid-token")
+				.param("q", "one two three four five six seven eight nine ten eleven"))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.code").value("INVALID_RESTAURANT_SEARCH"));
+	}
+
+	@Test
 	void reportsAnUnknownRatedMenuItem() throws Exception {
 		mockMvc.perform(post("/v1/ratings")
 				.header("Authorization", "Bearer valid-token")
