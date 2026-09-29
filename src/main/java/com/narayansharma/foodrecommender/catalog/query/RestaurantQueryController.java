@@ -1,8 +1,13 @@
 package com.narayansharma.foodrecommender.catalog.query;
 
+import com.narayansharma.foodrecommender.catalog.discovery.ExternalRestaurantId;
 import com.narayansharma.foodrecommender.catalog.discovery.RestaurantSearchQuery;
+import com.narayansharma.foodrecommender.catalog.selection.RestaurantSelectionService;
+import com.narayansharma.foodrecommender.catalog.selection.SelectRestaurantRequest;
+import com.narayansharma.foodrecommender.catalog.selection.SelectedRestaurant;
 import com.narayansharma.foodrecommender.identity.auth.UserPrincipal;
 import com.narayansharma.foodrecommender.platform.web.ApiException;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -14,6 +19,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,16 +33,19 @@ public class RestaurantQueryController {
 	private final RestaurantQueryService queryService;
 	private final CurrentMenuQueryService currentMenuService;
 	private final RestaurantSearchRateLimiter searchRateLimiter;
+	private final RestaurantSelectionService selectionService;
 
 	public RestaurantQueryController(
 			RestaurantSearchService searchService,
 			RestaurantQueryService queryService,
 			CurrentMenuQueryService currentMenuService,
-			RestaurantSearchRateLimiter searchRateLimiter) {
+			RestaurantSearchRateLimiter searchRateLimiter,
+			RestaurantSelectionService selectionService) {
 		this.searchService = searchService;
 		this.queryService = queryService;
 		this.currentMenuService = currentMenuService;
 		this.searchRateLimiter = searchRateLimiter;
+		this.selectionService = selectionService;
 	}
 
 	@GetMapping("/{restaurantId}")
@@ -46,6 +56,11 @@ public class RestaurantQueryController {
 	@GetMapping("/{restaurantId}/menus/current")
 	public CurrentMenuView currentMenu(@PathVariable UUID restaurantId) {
 		return currentMenuService.get(restaurantId);
+	}
+
+	@PostMapping("/resolve")
+	public SelectedRestaurant select(@Valid @RequestBody SelectRestaurantRequest request) {
+		return selectionService.select(new ExternalRestaurantId(request.source(), request.externalId()));
 	}
 
 	@GetMapping("/search")
