@@ -1,5 +1,6 @@
 package com.narayansharma.foodrecommender.menu.source;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -76,6 +77,15 @@ class MenuSourceControllerTest {
 				.andExpect(jsonPath("$.menuVersionId").isNotEmpty())
 				.andExpect(jsonPath("$.extractionStatus").value("PROCESSING"))
 				.andExpect(jsonPath("$.mediaType").value("image/png"));
+
+		UUID menuId = jdbcTemplate.queryForObject(
+				"SELECT id FROM menus WHERE restaurant_location_id = ? AND menu_key = 'main'",
+				UUID.class,
+				LOCATION_ID);
+		mockMvc.perform(get("/v1/menus/{menuId}/status", menuId)
+				.header("Authorization", "Bearer menu-token"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.status").value("QUEUED"));
 	}
 
 	@Test
