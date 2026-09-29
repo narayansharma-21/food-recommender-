@@ -22,17 +22,25 @@ import org.springframework.web.bind.annotation.RestController;
 public class RestaurantQueryController {
 	private final RestaurantSearchService searchService;
 	private final RestaurantQueryService queryService;
+	private final CurrentMenuQueryService currentMenuService;
 
 	public RestaurantQueryController(
 			RestaurantSearchService searchService,
-			RestaurantQueryService queryService) {
+			RestaurantQueryService queryService,
+			CurrentMenuQueryService currentMenuService) {
 		this.searchService = searchService;
 		this.queryService = queryService;
+		this.currentMenuService = currentMenuService;
 	}
 
 	@GetMapping("/{restaurantId}")
 	public RestaurantView get(@PathVariable UUID restaurantId) {
 		return queryService.get(restaurantId);
+	}
+
+	@GetMapping("/{restaurantId}/menus/current")
+	public CurrentMenuView currentMenu(@PathVariable UUID restaurantId) {
+		return currentMenuService.get(restaurantId);
 	}
 
 	@GetMapping("/search")
