@@ -96,6 +96,8 @@ class UserMenuImageSourceServiceTest {
 		assertThat(number("SELECT version_number FROM menu_versions WHERE id = ?", secondUpload.versionId()))
 				.isEqualTo(2);
 		assertThat(countExtractionJobs()).isEqualTo(2);
+		assertThat(number("SELECT COUNT(*) FROM menu_processing_jobs WHERE menu_version_id = ?", uploaded.versionId()))
+				.isOne();
 	}
 
 	@Test
