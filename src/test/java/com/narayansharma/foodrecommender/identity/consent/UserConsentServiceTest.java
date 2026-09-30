@@ -5,14 +5,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.narayansharma.foodrecommender.identity.InternalUser;
 import com.narayansharma.foodrecommender.identity.UserProvisioningService;
 import com.narayansharma.foodrecommender.identity.auth.VerifiedIdentity;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @Transactional
+@Import(UserConsentServiceTest.PreciseClockConfiguration.class)
 class UserConsentServiceTest {
 	@Autowired
 	private UserProvisioningService provisioningService;
@@ -41,5 +49,14 @@ class UserConsentServiceTest {
 				"SELECT COUNT(*) FROM user_consent_events WHERE user_id = ?",
 				Integer.class,
 				user.id())).isEqualTo(2);
+	}
+
+	@TestConfiguration(proxyBeanMethods = false)
+	static class PreciseClockConfiguration {
+		@Bean
+		@Primary
+		Clock preciseTestClock() {
+			return Clock.fixed(Instant.parse("2026-09-30T12:34:56.123456789Z"), ZoneOffset.UTC);
+		}
 	}
 }

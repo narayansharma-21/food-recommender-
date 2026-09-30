@@ -3,6 +3,7 @@ package com.narayansharma.foodrecommender.identity.consent;
 import java.sql.Timestamp;
 import java.time.Clock;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -38,7 +39,7 @@ public class UserConsentService {
 				""", Integer.class, userId, type.name());
 		int sequence = (latestSequence == null ? 0 : latestSequence) + 1;
 		UUID eventId = UUID.randomUUID();
-		Instant recordedAt = clock.instant();
+		Instant recordedAt = clock.instant().truncatedTo(ChronoUnit.MICROS);
 		jdbcTemplate.update("""
 				INSERT INTO user_consent_events (
 				    id, user_id, consent_type, event_sequence,
