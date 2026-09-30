@@ -75,6 +75,12 @@ data. Send `locationId`, an optional `menuKey` and `displayName`, and a JPEG or 
 The API creates or reuses the menu, stores the validated image, and returns `202` while extraction runs.
 Poll `GET /v1/menus/{menuId}/status` for `QUEUED`, `PROCESSING`, `READY`, or `FAILED`.
 
+The configured administrator can submit an official HTML or PDF menu with
+`POST /v1/admin/menus/official-sources`. The backend validates every URL and redirect, rejects non-public
+network addresses, limits response time and size, stores changed content as a new version, and queues the
+same extraction pipeline. Repeated submissions reuse an active fetch job and unchanged content does not
+create another menu version.
+
 The application must display the attribution required by the datasets included in Overture. See the
 [Overture attribution guide](https://docs.overturemaps.org/attribution/) before distributing data.
 

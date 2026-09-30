@@ -82,6 +82,11 @@ recommendation:
     window: ${RECOMMENDATION_RATE_LIMIT_WINDOW:PT1M}
 
 menu:
+  fetch:
+    connect-timeout: ${MENU_FETCH_CONNECT_TIMEOUT:PT5S}
+    request-timeout: ${MENU_FETCH_REQUEST_TIMEOUT:PT15S}
+    max-bytes: ${MENU_FETCH_MAX_BYTES:10485760}
+    max-redirects: ${MENU_FETCH_MAX_REDIRECTS:3}
   extraction:
     parser-version: ${MENU_EXTRACTION_PARSER_VERSION:rules-v1}
   upload:

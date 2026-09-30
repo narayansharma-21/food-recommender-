@@ -148,16 +148,18 @@ Proof-of-concept delivery:
 
 ### 4.4 Menu Sources and Versioning
 
-Status: User image upload, storage, versioning, and extraction queueing are exposed through an authenticated
-API. Official URL registration exists internally; secure URL fetching remains the next source milestone.
-Verification, freshness, reporting, and admin review (`MENU-06` through `MENU-09`) are deferred.
+Status: User image upload and admin-only official HTML/PDF ingestion are exposed through authenticated APIs.
+Both paths store versioned source content and queue extraction. Verification, freshness, reporting, and
+admin review (`MENU-06` through `MENU-09`) are deferred.
 
-Image upload delivery:
+Proof-of-concept delivery:
 
 - Upload responses return a stable menu and version ID without exposing object-storage keys.
 - Extraction jobs are linked to their menu versions for reliable client status polling.
 - Status progresses through awaiting source, queued, processing, ready, or failed without exposing internal
   failure details.
+- Official URL fetches validate redirects and public network addresses, enforce time and size limits, and
+  create a new version only when the downloaded content changes.
 
 Owns menu sources, snapshots, versions, freshness, and publication state.
 
