@@ -38,3 +38,49 @@ jobs:
 
       - name: Test ML evaluation jobs
         run: python3 -m unittest discover -s ml/tests -v
+
+  postgres-integration:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:17.6-alpine
+        env:
+          POSTGRES_DB: food_recommender_test
+          POSTGRES_USER: food_recommender
+          POSTGRES_PASSWORD: integration-test-only
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U food_recommender -d food_recommender_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/food_recommender_test
+      SPRING_DATASOURCE_USERNAME: food_recommender
+      SPRING_DATASOURCE_PASSWORD: integration-test-only
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+
+      - name: Set up Java 21
+        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
+
+      - name: Run migrations and validate the production schema
+        shell: bash
+        run: |
+          mkdir -p .ci
+          set -o pipefail
+          ./gradlew --no-daemon --no-watch-fs --console=plain clean test \
+            --tests com.narayansharma.foodrecommender.FoodRecommenderBackendApplicationTests \
+            2>&1 | tee .ci/gradle.log
+
+      - name: Report PostgreSQL validation failure
+        if: failure()
+        run: python3 .github/scripts/report_ci_failure.py .ci/gradle.log build/test-results/test
