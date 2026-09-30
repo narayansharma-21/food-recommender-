@@ -14,6 +14,7 @@ class LocalOcrEngineTest {
 		LocalOcrEngine engine = new LocalOcrEngine(
 				image -> new TesseractOutput("Margherita Pizza  14", 0.92),
 				pdf -> { throw new AssertionError("PDF processor should not be called"); },
+				new HtmlMenuTextExtractor(),
 				"test-v1");
 
 		OcrResult result = engine.extract(new OcrDocument("image/png", new byte[] {1, 2, 3}));
@@ -30,10 +31,32 @@ class LocalOcrEngineTest {
 		LocalOcrEngine engine = new LocalOcrEngine(
 				image -> { throw new AssertionError("Image runner should not be called"); },
 				pdf -> List.of(new OcrPage(1, "Menu", 1)),
+				new HtmlMenuTextExtractor(),
 				"test-v1");
 
 		OcrResult result = engine.extract(new OcrDocument("application/pdf", new byte[] {1}));
 
 		assertThat(result.fullText()).isEqualTo("Menu");
+	}
+
+	@Test
+	void extractsReadableTextFromHtmlWithoutRunningOcr() {
+		LocalOcrEngine engine = new LocalOcrEngine(
+				image -> { throw new AssertionError("Image runner should not be called"); },
+				pdf -> { throw new AssertionError("PDF processor should not be called"); },
+				new HtmlMenuTextExtractor(),
+				"test-v1");
+
+		OcrResult result = engine.extract(new OcrDocument(
+				"text/html",
+				"""
+						<html><style>.price { color: red; }</style><body>
+						<h2>Dinner &amp; Drinks</h2><p>Margherita Pizza&nbsp;$14</p>
+						<script>doNotExtract()</script></body></html>
+						""".getBytes(java.nio.charset.StandardCharsets.UTF_8)));
+
+		assertThat(result.fullText())
+				.isEqualTo("Dinner & Drinks\nMargherita Pizza $14")
+				.doesNotContain("color", "doNotExtract");
 	}
 }

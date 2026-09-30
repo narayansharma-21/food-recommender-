@@ -4,7 +4,7 @@ import java.util.Set;
 
 public record OcrDocument(String mediaType, byte[] content) {
 	private static final Set<String> SUPPORTED_MEDIA_TYPES = Set.of(
-			"image/jpeg", "image/png", "application/pdf");
+			"image/jpeg", "image/png", "application/pdf", "text/html", "application/xhtml+xml");
 
 	public OcrDocument {
 		if (mediaType == null || !SUPPORTED_MEDIA_TYPES.contains(mediaType)) {
