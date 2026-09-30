@@ -21,6 +21,7 @@ class MenuProcessingStatusServiceTest {
 	private static final UUID SOURCE_ID = UUID.fromString("40000000-0000-0000-0000-000000000001");
 	private static final UUID VERSION_ID = UUID.fromString("41000000-0000-0000-0000-000000000001");
 	private static final UUID JOB_ID = UUID.fromString("42000000-0000-0000-0000-000000000001");
+	private static final UUID FETCH_JOB_ID = UUID.fromString("43000000-0000-0000-0000-000000000001");
 
 	@Autowired
 	private MenuProcessingStatusService service;
@@ -116,6 +117,33 @@ class MenuProcessingStatusServiceTest {
 
 		assertThat(status.status()).isEqualTo("AWAITING_SOURCE");
 		assertThat(status.menuVersionId()).isNull();
+	}
+
+	@Test
+	void reportsAnOfficialSourceFetchBeforeTheFirstVersion() {
+		jdbcTemplate.update("DELETE FROM menu_processing_jobs WHERE menu_version_id = ?", VERSION_ID);
+		jdbcTemplate.update("DELETE FROM background_jobs WHERE id = ?", JOB_ID);
+		jdbcTemplate.update("DELETE FROM menu_versions WHERE id = ?", VERSION_ID);
+		jdbcTemplate.update("""
+				INSERT INTO background_jobs (
+				    id, job_type, payload, status, attempts, available_at, created_at, updated_at
+				) VALUES (?, 'MENU_SOURCE_FETCH', '{}', 'PENDING', 0, CURRENT_TIMESTAMP,
+				          CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+				""", FETCH_JOB_ID);
+		jdbcTemplate.update("""
+				INSERT INTO menu_source_fetch_jobs (job_id, source_id, created_at)
+				VALUES (?, ?, CURRENT_TIMESTAMP)
+				""", FETCH_JOB_ID, SOURCE_ID);
+
+		assertThat(service.get(MENU_ID).status()).isEqualTo("QUEUED");
+
+		jdbcTemplate.update("""
+				UPDATE background_jobs
+				SET status = 'RUNNING', attempts = 1, locked_at = CURRENT_TIMESTAMP,
+				    locked_by = 'worker', updated_at = CURRENT_TIMESTAMP
+				WHERE id = ?
+				""", FETCH_JOB_ID);
+		assertThat(service.get(MENU_ID).status()).isEqualTo("PROCESSING");
 	}
 
 	@Test

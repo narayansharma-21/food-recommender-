@@ -25,6 +25,11 @@ public class MenuProcessingStatusService {
 		Instant menuUpdatedAt = requireMenu(menuId);
 		MenuVersion version = latestVersion(menuId);
 		if (version == null) {
+			ProcessingJob sourceJob = latestSourceFetchJob(menuId);
+			if (sourceJob != null) {
+				return new MenuProcessingStatusView(
+						menuId, null, null, null, jobStatus(sourceJob), sourceJob.updatedAt());
+			}
 			return new MenuProcessingStatusView(
 					menuId, null, null, null, "AWAITING_SOURCE", menuUpdatedAt);
 		}
@@ -35,13 +40,16 @@ public class MenuProcessingStatusService {
 		if (job == null) {
 			return view(menuId, version, "PROCESSING", version.capturedAt());
 		}
-		String status = switch (job.status()) {
+		return view(menuId, version, jobStatus(job), job.updatedAt());
+	}
+
+	private String jobStatus(ProcessingJob job) {
+		return switch (job.status()) {
 			case "PENDING" -> "QUEUED";
 			case "RUNNING" -> "PROCESSING";
 			case "FAILED", "COMPLETED" -> "FAILED";
 			default -> throw new IllegalStateException("Unknown menu processing job status");
 		};
-		return view(menuId, version, status, job.updatedAt());
 	}
 
 	private Instant requireMenu(UUID menuId) {
@@ -97,6 +105,22 @@ public class MenuProcessingStatusService {
 				""", (resultSet, rowNumber) -> new ProcessingJob(
 				resultSet.getString("status"),
 				resultSet.getTimestamp("updated_at").toInstant()), versionId).stream()
+				.findFirst()
+				.orElse(null);
+	}
+
+	private ProcessingJob latestSourceFetchJob(UUID menuId) {
+		return jdbcTemplate.query("""
+				SELECT job.status, job.updated_at
+				FROM menu_source_fetch_jobs link
+				JOIN menu_sources source ON source.id = link.source_id
+				JOIN background_jobs job ON job.id = link.job_id
+				WHERE source.menu_id = ?
+				ORDER BY link.created_at DESC, link.job_id
+				LIMIT 1
+				""", (resultSet, rowNumber) -> new ProcessingJob(
+				resultSet.getString("status"),
+				resultSet.getTimestamp("updated_at").toInstant()), menuId).stream()
 				.findFirst()
 				.orElse(null);
 	}
