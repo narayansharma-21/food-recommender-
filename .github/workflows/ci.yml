@@ -84,3 +84,49 @@ jobs:
       - name: Report PostgreSQL validation failure
         if: failure()
         run: python3 .github/scripts/report_ci_failure.py .ci/gradle.log build/test-results/test
+
+      - name: Verify database backup and restore
+        shell: bash
+        run: |
+          set -euo pipefail
+          postgres_container=$(docker ps \
+            --filter ancestor=postgres:17.6-alpine \
+            --format '{{.ID}}' | head -n 1)
+          test -n "$postgres_container"
+
+          docker exec "$postgres_container" mkdir -p /tmp/database-scripts
+          docker cp scripts/database/. "$postgres_container:/tmp/database-scripts"
+
+          docker exec -e PGPASSWORD=integration-test-only "$postgres_container" \
+            psql --host=127.0.0.1 --username=food_recommender \
+            --dbname=food_recommender_test --set ON_ERROR_STOP=1 \
+            --command "INSERT INTO background_jobs (
+              id, job_type, payload, status, available_at, created_at, updated_at
+            ) VALUES (
+              '00000000-0000-0000-0000-000000000001', 'BACKUP_TEST', '{}', 'COMPLETED',
+              CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+            )"
+
+          docker exec -e PGPASSWORD=integration-test-only "$postgres_container" \
+            sh /tmp/database-scripts/backup.sh \
+            postgresql://food_recommender@127.0.0.1:5432/food_recommender_test \
+            /tmp/food-recommender.backup
+
+          docker exec -e PGPASSWORD=integration-test-only "$postgres_container" \
+            psql --host=127.0.0.1 --username=food_recommender \
+            --dbname=food_recommender_test --set ON_ERROR_STOP=1 \
+            --command "DELETE FROM background_jobs WHERE job_type = 'BACKUP_TEST'"
+
+          docker exec \
+            -e PGPASSWORD=integration-test-only \
+            -e CONFIRM_DATABASE_RESTORE=yes \
+            "$postgres_container" \
+            sh /tmp/database-scripts/restore.sh \
+            postgresql://food_recommender@127.0.0.1:5432/food_recommender_test \
+            /tmp/food-recommender.backup
+
+          restored_count=$(docker exec -e PGPASSWORD=integration-test-only "$postgres_container" \
+            psql --host=127.0.0.1 --username=food_recommender \
+            --dbname=food_recommender_test --tuples-only --no-align \
+            --command "SELECT COUNT(*) FROM background_jobs WHERE job_type = 'BACKUP_TEST'")
+          test "$restored_count" = "1"
