@@ -399,8 +399,9 @@ Done when:
 ### 4.12 Security and Reliability
 
 Status: User-ownership authorization tests, upload type and size checks, upload, search, and recommendation
-rate limiting, and provider failure behavior are complete for the proof of concept. Shared multi-instance
-rate limiting, malware scanning, backups, retention, and infrastructure security scanning remain launch tasks.
+rate limiting, provider failure behavior, dependency update monitoring, and CodeQL source scanning are
+complete. Shared multi-instance rate limiting, malware scanning, backups, retention, and container or
+infrastructure scanning remain launch tasks.
 
 Tasks:
 
