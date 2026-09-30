@@ -400,8 +400,9 @@ Done when:
 
 Status: User-ownership authorization tests, upload type and size checks, upload, search, and recommendation
 rate limiting, provider failure behavior, dependency update monitoring, CodeQL source scanning, and
-critical production-container scanning are complete. Shared multi-instance rate limiting, malware scanning,
-backups, retention, and infrastructure scanning remain launch tasks.
+critical production-container scanning are complete. Provider-neutral backup commands and automated restore
+verification are also complete. Shared multi-instance rate limiting, malware scanning, hosted backup
+scheduling, retention, and infrastructure scanning remain launch tasks.
 
 Tasks:
 

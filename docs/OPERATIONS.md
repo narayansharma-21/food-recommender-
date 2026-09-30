@@ -45,8 +45,32 @@
 - Signed-in users without the configured admin identity receive `403 AUTHORIZATION_DENIED` on admin routes.
 - Admin access is an exact `provider:subject` allowlist supplied through `ADMIN_IDENTITIES`.
 
+## Database backup and restore
+
+Use PostgreSQL client tools from the same major version as the database. Supply the password through
+`PGPASSWORD` or a PostgreSQL password file so it is not included in the command history.
+
+```bash
+scripts/database/backup.sh \
+  postgresql://food_recommender@database:5432/food_recommender \
+  /secure-backups/food-recommender.backup
+```
+
+The backup command creates a private custom-format archive and verifies that PostgreSQL can read its
+catalog. Stop application writes before a full restore, verify the target database, and explicitly confirm
+the destructive operation:
+
+```bash
+CONFIRM_DATABASE_RESTORE=yes scripts/database/restore.sh \
+  postgresql://food_recommender@database:5432/food_recommender \
+  /secure-backups/food-recommender.backup
+```
+
+Restore runs in one transaction and exits on the first error. CI exercises the full process against
+PostgreSQL by backing up a known record, deleting it, restoring the database, and confirming its return.
+
 ## Deferred launch controls
 
-Database backup/restore automation, raw-image retention, malware scanning, shared multi-instance rate
+Hosted backup scheduling and retention, raw-image retention, malware scanning, shared multi-instance rate
 limiting, and hosted encryption settings depend on the selected deployment and storage providers. They must
 be completed and tested before a public launch; they are not required to run the local proof of concept.
